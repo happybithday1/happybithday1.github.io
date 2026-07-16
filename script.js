@@ -245,6 +245,9 @@ function revealLetter() {
   document.querySelector('.scene').classList.add('is-glow');
   hint.textContent = '';
 
+  // Устанавливаем текст письма ДО анимации
+  letterText.textContent = TEXT.letterBody;
+
   const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
   // Камера плавно приближается
@@ -252,51 +255,28 @@ function revealLetter() {
   timeline.to(document.documentElement, { '--camera-y': '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
   timeline.to(camera, { filter: 'brightness(1.08) saturate(1.06)', duration: 1.4 }, 0);
 
-  // Торт мягко светится
-  timeline.to(cake, { filter: 'drop-shadow(0 0 26px rgba(241, 198, 90, 0.92))', duration: 0.8, ease: 'power2.inOut' }, 0);
-  timeline.to('.candle__flame', { scale: 1.16, duration: 0.5, repeat: 5, yoyo: true, ease: 'sine.inOut' }, 0);
-
-  // Скрываем лишние элементы плавно
+  // Скрываем всё лишнее плавно
   timeline.to(cheerMain, { opacity: 0, y: -20, duration: 0.8, ease: 'power2.inOut' }, 0.1);
   timeline.to(hint, { opacity: 0, duration: 0.5 }, 0.1);
   timeline.to(".road", { opacity: 0, duration: 0.7 }, 0.2);
   timeline.to(prologue, { opacity: 0, duration: 0.6 }, 0.1);
 
-  // Письмо появляется очень плавно — с размытия, снизу, мягко
+  // Торт плавно уходит
+  timeline.to(cake, { opacity: 0, scale: 0.9, duration: 1.0, ease: 'power2.inOut' }, 0.3);
+  timeline.to('.cake-halo', { opacity: 0, duration: 0.8 }, 0.3);
+
+  // Письмо целиком плавно появляется из размытия
   timeline.fromTo(letterWrap,
-    { opacity: 0, scale: 0.92, y: 80, filter: 'blur(12px)' },
-    { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)', duration: 2.8, ease: 'power2.out' },
-    0.7
+    { opacity: 0, scale: 0.94, y: 60, filter: 'blur(8px)' },
+    { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)', duration: 2.4, ease: 'power2.out' },
+    0.8
   );
-  timeline.to(letter, { pointerEvents: 'auto' }, 0.7);
-
-  // Конверт открывается
-  timeline.to(letter, { onStart: () => letter.classList.add('is-open') }, 1.2);
-  timeline.to(".letter__top", { opacity: 1, duration: 0.01 }, 0.8);
-  timeline.to(".letter__top", { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 1.4);
-
-  // Внутренние элементы письма появляются поочередно с blur
-  timeline.fromTo(letter.querySelector('.letter__title'),
-    { opacity: 0, y: 24, filter: 'blur(6px)' },
-    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
-    1.8
-  );
-  timeline.fromTo(letter.querySelector('.letter__text'),
-    { opacity: 0, y: 24, filter: 'blur(6px)' },
-    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out' },
-    2.2
-  );
-  timeline.fromTo(letter.querySelector('.letter__button'),
-    { opacity: 0, y: 16, filter: 'blur(4px)' },
-    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
-    2.7
-  );
+  timeline.to(letter, { pointerEvents: 'auto' }, 1.2);
 
   timeline.add(() => {
-    letterText.textContent = TEXT.letterBody;
     createAmbientBurst(cake);
     launchBursts(cake, 40);
-  }, 1.6);
+  }, 1.4);
 }
 
 function setupBlowScene() {
