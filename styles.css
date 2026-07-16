@@ -654,20 +654,21 @@ button {
   position: absolute;
   left: 50%;
   bottom: 73vh;
-  width: min(760px, calc(100vw - 32px));
+  width: min(1400px, calc(100vw - 32px));
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 90;
   text-align: center;
   font-family: "Cormorant Garamond", serif;
-  font-size: clamp(1.4rem, 3.6vw, 3.3rem);
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-weight: 700;
   letter-spacing: 0.05em;
   color: #fff8e0;
   text-shadow:
-    0 0 18px rgba(255, 220, 100, 0.95),
-    0 0 40px rgba(255, 190, 50, 0.75),
-    0 0 80px rgba(239, 150, 30, 0.45),
-    0 8px 24px rgba(0, 0, 0, 0.7);
-  filter: drop-shadow(0 0 12px rgba(255, 210, 80, 0.6));
+    0 0 15px rgba(255, 220, 100, 0.95),
+    0 0 30px rgba(255, 190, 50, 0.8),
+    0 0 60px rgba(239, 150, 30, 0.5),
+    0 12px 36px rgba(0, 0, 0, 0.8);
+  filter: drop-shadow(0 0 10px rgba(255, 210, 80, 0.5));
   opacity: 0;
 }
 
@@ -1055,7 +1056,7 @@ button {
 
   .cheer {
     bottom: 68vh;
-    font-size: clamp(1.2rem, 6vw, 2rem);
+    font-size: clamp(1.6rem, 7vw, 2.6rem);
   }
 
   .hint {

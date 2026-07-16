@@ -256,7 +256,6 @@ function revealLetter() {
   timeline.to(camera, { filter: 'brightness(1.08) saturate(1.06)', duration: 1.4 }, 0);
 
   // Скрываем всё лишнее плавно
-  timeline.to(cheerMain, { opacity: 0, y: -20, duration: 0.8, ease: 'power2.inOut' }, 0.1);
   timeline.to(hint, { opacity: 0, duration: 0.5 }, 0.1);
   timeline.to(".road", { opacity: 0, duration: 0.7 }, 0.2);
   timeline.to(prologue, { opacity: 0, duration: 0.6 }, 0.1);
@@ -265,10 +264,10 @@ function revealLetter() {
   timeline.to(cake, { opacity: 0, scale: 0.9, duration: 1.0, ease: 'power2.inOut' }, 0.3);
   timeline.to('.cake-halo', { opacity: 0, duration: 0.8 }, 0.3);
 
-  // Письмо целиком плавно появляется из размытия
+  // Письмо целиком плавно появляется (без blur, чтобы не было "резкости" в конце)
   timeline.fromTo(letterWrap,
-    { opacity: 0, scale: 0.94, y: 60, filter: 'blur(8px)' },
-    { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)', duration: 2.4, ease: 'power2.out' },
+    { opacity: 0, scale: 0.94, y: 60 },
+    { opacity: 1, scale: 1, y: 0, duration: 2.2, ease: 'power2.out' },
     0.8
   );
   timeline.to(letter, { pointerEvents: 'auto' }, 1.2);
