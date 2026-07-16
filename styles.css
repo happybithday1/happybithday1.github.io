@@ -923,14 +923,26 @@ button {
   background: linear-gradient(180deg, rgba(248, 234, 192, 0.9), rgba(211, 164, 71, 0.7));
 }
 
+@keyframes flapLeft {
+  0%, 100% { transform: rotate(25deg) rotateY(0deg); }
+  50% { transform: rotate(25deg) rotateY(65deg); }
+}
+
+@keyframes flapRight {
+  0%, 100% { transform: scaleX(-1) rotate(25deg) rotateY(0deg); }
+  50% { transform: scaleX(-1) rotate(25deg) rotateY(65deg); }
+}
+
 .butterfly::before {
   left: 0;
-  transform: rotate(25deg);
+  transform-origin: right center;
+  animation: flapLeft 0.15s infinite ease-in-out;
 }
 
 .butterfly::after {
   right: 0;
-  transform: scaleX(-1) rotate(25deg);
+  transform-origin: right center;
+  animation: flapRight 0.15s infinite ease-in-out;
 }
 
 .petal {

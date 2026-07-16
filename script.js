@@ -121,26 +121,76 @@ function createAtmosphere() {
     return firefly;
   });
 
-  buildAtmosphereLayer(butterflies, 'butterfly', 6, () => {
+  buildAtmosphereLayer(butterflies, 'butterfly', 18, () => {
     const butterfly = document.createElement('span');
     butterfly.style.left = `${rand(10, 90)}%`;
     butterfly.style.top = `${rand(18, 72)}%`;
+    
+    function fly() {
+      const xMove = rand(-window.innerWidth * 0.4, window.innerWidth * 0.4);
+      const yMove = rand(-window.innerHeight * 0.3, window.innerHeight * 0.3);
+      const direction = xMove > 0 ? 1 : -1;
+      
+      gsap.to(butterfly, {
+        x: `+=${xMove}`,
+        y: `+=${yMove}`,
+        rotation: rand(-15, 15),
+        scaleX: direction,
+        duration: rand(8, 14),
+        ease: 'sine.inOut',
+        onComplete: fly
+      });
+    }
+    
+    setTimeout(fly, rand(0, 2000));
     return butterfly;
   });
 
-  buildAtmosphereLayer(petals, 'petal', 14, () => {
+  buildAtmosphereLayer(petals, 'petal', 24, () => {
     const petal = document.createElement('span');
     petal.style.left = `${rand(4, 96)}%`;
-    petal.style.top = `${rand(0, 20)}%`;
+    petal.style.top = `${rand(-10, 100)}vh`;
     petal.style.opacity = `${rand(0.3, 0.8)}`;
+    
+    function fall() {
+      gsap.to(petal, {
+        y: window.innerHeight + 200,
+        x: `+=${rand(-100, 100)}`,
+        rotation: rand(-360, 360),
+        duration: rand(10, 18),
+        ease: 'none',
+        onComplete: () => {
+          gsap.set(petal, { y: -100, top: '-5vh', x: 0 });
+          fall();
+        }
+      });
+    }
+    fall();
+    
     return petal;
   });
 
-  buildAtmosphereLayer(leaves, 'leaf', 12, () => {
+  buildAtmosphereLayer(leaves, 'leaf', 20, () => {
     const leaf = document.createElement('span');
     leaf.style.left = `${rand(2, 98)}%`;
-    leaf.style.top = `${rand(0, 28)}%`;
+    leaf.style.top = `${rand(-10, 100)}vh`;
     leaf.style.opacity = `${rand(0.35, 0.7)}`;
+    
+    function fall() {
+      gsap.to(leaf, {
+        y: window.innerHeight + 200,
+        x: `+=${rand(-120, 120)}`,
+        rotation: rand(-360, 360),
+        duration: rand(12, 22),
+        ease: 'none',
+        onComplete: () => {
+          gsap.set(leaf, { y: -100, top: '-5vh', x: 0 });
+          fall();
+        }
+      });
+    }
+    fall();
+    
     return leaf;
   });
 }
