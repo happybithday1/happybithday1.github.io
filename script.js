@@ -158,7 +158,13 @@ function showPrologue(lines) {
 
   const timeline = gsap.timeline();
   lineElements.forEach((line, index) => {
-    timeline.to(line, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out' }, index === 0 ? 0 : '+=0.95');
+    timeline.to(line, {
+    opacity: 1,
+    y: index === 1 ? -150 : 0,
+    filter: 'blur(0px)',
+    duration: 0.9,
+    ease: 'power3.out'
+}, index === 0 ? 0 : '+=0.95');
     timeline.to(line, { opacity: 0.88, duration: 1.2 }, '+=1.0');
   });
   return timeline;
@@ -239,25 +245,58 @@ function revealLetter() {
   document.querySelector('.scene').classList.add('is-glow');
   hint.textContent = '';
 
-  const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  timeline.to(document.documentElement, { '--camera-scale': 1.08, duration: 1.2 }, 0);
-  timeline.to(document.documentElement, { '--camera-y': '-18px', duration: 1.2 }, 0);
-  timeline.to(camera, { filter: 'brightness(1.1) saturate(1.08)', duration: 1.2 }, 0);
-  timeline.to(cake, { filter: 'drop-shadow(0 0 26px rgba(241, 198, 90, 0.92))', duration: 0.6 }, 0);
+  const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+  // Камера плавно приближается
+  timeline.to(document.documentElement, { '--camera-scale': 1.06, duration: 1.6, ease: 'power2.inOut' }, 0);
+  timeline.to(document.documentElement, { '--camera-y': '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
+  timeline.to(camera, { filter: 'brightness(1.08) saturate(1.06)', duration: 1.4 }, 0);
+
+  // Торт мягко светится
+  timeline.to(cake, { filter: 'drop-shadow(0 0 26px rgba(241, 198, 90, 0.92))', duration: 0.8, ease: 'power2.inOut' }, 0);
   timeline.to('.candle__flame', { scale: 1.16, duration: 0.5, repeat: 5, yoyo: true, ease: 'sine.inOut' }, 0);
-  timeline.to(cheerMain, { opacity: 0, duration: 0.6 }, 0.1);
-  timeline.to(hint, { opacity: 0, duration: 0.35 }, 0.1);
-  timeline.to(letterWrap, { opacity: 1, scale: 1, rotateX: 0, duration: 1.3, ease: 'back.out(1.1)' }, 0.45);
-  timeline.to(letter, { pointerEvents: 'auto' }, 0.45);
-  timeline.to(letter, { onStart: () => letter.classList.add('is-open') }, 0.7);
-  timeline.to(letter.querySelector('.letter__title'), { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.9 }, 1.1);
-  timeline.to(letter.querySelector('.letter__text'), { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0 }, 1.35);
-  timeline.to(letter.querySelector('.letter__button'), { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8 }, 1.55);
+
+  // Скрываем лишние элементы плавно
+  timeline.to(cheerMain, { opacity: 0, y: -20, duration: 0.8, ease: 'power2.inOut' }, 0.1);
+  timeline.to(hint, { opacity: 0, duration: 0.5 }, 0.1);
+  timeline.to(".road", { opacity: 0, duration: 0.7 }, 0.2);
+  timeline.to(prologue, { opacity: 0, duration: 0.6 }, 0.1);
+
+  // Письмо появляется очень плавно — с размытия, снизу, мягко
+  timeline.fromTo(letterWrap,
+    { opacity: 0, scale: 0.92, y: 80, filter: 'blur(12px)' },
+    { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)', duration: 2.8, ease: 'power2.out' },
+    0.7
+  );
+  timeline.to(letter, { pointerEvents: 'auto' }, 0.7);
+
+  // Конверт открывается
+  timeline.to(letter, { onStart: () => letter.classList.add('is-open') }, 1.2);
+  timeline.to(".letter__top", { opacity: 1, duration: 0.01 }, 0.8);
+  timeline.to(".letter__top", { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 1.4);
+
+  // Внутренние элементы письма появляются поочередно с blur
+  timeline.fromTo(letter.querySelector('.letter__title'),
+    { opacity: 0, y: 24, filter: 'blur(6px)' },
+    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+    1.8
+  );
+  timeline.fromTo(letter.querySelector('.letter__text'),
+    { opacity: 0, y: 24, filter: 'blur(6px)' },
+    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out' },
+    2.2
+  );
+  timeline.fromTo(letter.querySelector('.letter__button'),
+    { opacity: 0, y: 16, filter: 'blur(4px)' },
+    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+    2.7
+  );
+
   timeline.add(() => {
     letterText.textContent = TEXT.letterBody;
     createAmbientBurst(cake);
     launchBursts(cake, 40);
-  }, 1.0);
+  }, 1.6);
 }
 
 function setupBlowScene() {
@@ -269,12 +308,16 @@ function setupBlowScene() {
   gsap.to(document.documentElement, { '--camera-y': '18px', duration: 1.2, ease: 'power3.inOut' });
   gsap.to('.candle__flame', { opacity: 0, scale: 0, duration: 0.5, stagger: 0.12, ease: 'power2.in' });
   gsap.to(cake, { filter: 'brightness(0.95) drop-shadow(0 0 10px rgba(241, 198, 90, 0.28))', duration: 0.8 });
-  gsap.to(letterWrap, { opacity: 0.72, duration: 0.8 });
-  gsap.to(letter, { scale: 0.98, duration: 0.8 });
+
+  // Письмо полностью исчезает
+  gsap.to(letterWrap, { opacity: 0, scale: 0.9, y: 40, duration: 1.0, ease: 'power2.inOut' });
+  gsap.to(letter, { scale: 0.92, duration: 0.8 });
+
+  // Финальная надпись появляется ПОСЛЕ исчезновения письма
   finale.classList.add('is-visible');
   finale.setAttribute('aria-hidden', 'false');
   finaleMessage.textContent = TEXT.finale;
-  gsap.fromTo(finale, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power2.out' });
+  gsap.fromTo(finale, { opacity: 0 }, { opacity: 1, duration: 1.2, delay: 0.8, ease: 'power2.out' });
 
   for (let index = 0; index < 120; index += 1) {
     const spark = document.createElement('span');
