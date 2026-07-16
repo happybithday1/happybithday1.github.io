@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f2b25" />
+  <title>Поздравление для загадочной фанатки Rusty Lake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="loading-screen" id="loadingScreen" aria-live="polite">
+    <div class="loading-screen__ornament"></div>
+    <div class="loading-screen__key" aria-hidden="true">
+      <svg viewBox="0 0 240 240" role="presentation">
+        <defs>
+          <linearGradient id="keyMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8d6b2f" />
+            <stop offset="55%" stop-color="#d7b46a" />
+            <stop offset="100%" stop-color="#6a4d1e" />
+          </linearGradient>
+        </defs>
+        <path d="M158 40c-30 0-54 24-54 54 0 10 3 19 7 27L36 196v20h28v-20h20v-20h20v-20h20l20-20c8 4 17 7 28 7 30 0 54-24 54-54S188 40 158 40Zm0 76a22 22 0 1 1 0-44 22 22 0 0 1 0 44Z" fill="url(#keyMetal)" stroke="#f7df9c" stroke-opacity="0.4" stroke-width="2"/>
+        <circle cx="158" cy="94" r="12" fill="#10120f" opacity="0.55" />
+      </svg>
+    </div>
+    <div class="loading-screen__copy">
+      <p class="loading-screen__title">Открываем двери загадочного озера...</p>
+      <div class="loading-screen__bar">
+        <span id="loadingBar"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <main class="app" id="app" aria-label="Поздравительная интерактивная история">
+    <section class="scene">
+      <div class="scene__atmosphere">
+        <div class="sky glow"></div>
+        <div class="sky stars"></div>
+        <div class="fog fog--far"></div>
+        <div class="fog fog--mid"></div>
+        <div class="fog fog--near"></div>
+        <div class="lights"></div>
+        <div class="particles" id="particles"></div>
+        <div class="butterflies" id="butterflies"></div>
+        <div class="petals" id="petals"></div>
+        <div class="leaves" id="leaves"></div>
+      </div>
+
+      <div class="scene__camera" id="camera">
+        <div class="prologue" id="prologue">
+          <p class="prologue__line is-active" data-line="0"></p>
+          <p class="prologue__line" data-line="1"></p>
+        </div>
+
+        <div class="world" id="world">
+          <div class="world__veil"></div>
+          <div class="stage-light stage-light--left"></div>
+          <div class="stage-light stage-light--right"></div>
+
+          <div class="road">
+            <div class="road__surface"></div>
+            <div class="road__lane"></div>
+            <div class="road__rail road__rail--left"></div>
+            <div class="road__rail road__rail--right"></div>
+          </div>
+
+          <div class="center-stage" id="centerStage">
+            <div class="cake-halo"></div>
+            <button class="cake" id="cake" type="button" aria-label="Нажми на торт">
+              <span class="cake__plate"></span>
+              <span class="cake__base"></span>
+              <span class="cake__cream"></span>
+              <span class="cake__top"></span>
+              <span class="cake__candles">
+                <span class="candle candle--1"><span class="candle__flame"></span></span>
+                <span class="candle candle--2"><span class="candle__flame"></span></span>
+                <span class="candle candle--3"><span class="candle__flame"></span></span>
+              </span>
+              <span class="cake__sparkles"></span>
+            </button>
+            <p class="hint" id="hint">Нажми на торт</p>
+          </div>
+
+          <div class="cheer cheer--main" id="cheerMain">Этот день принадлежит только тебе ❤️</div>
+
+          <div class="letter-wrap" id="letterWrap" aria-hidden="true">
+            <div class="letter-shadow"></div>
+            <section class="letter" id="letter">
+              <div class="letter__seal"></div>
+              <div class="letter__top"></div>
+              <div class="letter__inner">
+                <h1 class="letter__title">Для тебя</h1>
+                <p class="letter__text" id="letterText"></p>
+                <button class="letter__button" id="blowButton" type="button">Задуть свечи</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="finale" id="finale" aria-hidden="true">
+            <p class="finale__message">С Днем Рождения!</p>
+            <div class="finale__sky" id="finaleSky"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-hint">Дождись сцены и нажми на торт</div>
+    </section>
+  </main>
+</body>
+</html>
