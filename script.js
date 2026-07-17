@@ -102,17 +102,18 @@ function setRootPosition(x, y) {
 }
 
 function buildAtmosphereLayer(container, className, count, factory) {
+  const classes = className.split(' ').filter(Boolean);
   for (let index = 0; index < count; index += 1) {
     const element = factory(index);
-    element.classList.add(className);
+    element.classList.add(...classes);
     container.appendChild(element);
   }
 }
 
 function createAtmosphere() {
   const starsContainer = document.querySelector('.sky.stars');
-  
-  // Звёзды на заднем фоне (мерцающие точки)
+
+  // Основной звёздный слой (мерцающие точки)
   buildAtmosphereLayer(starsContainer, 'star', 60, () => {
     const star = document.createElement('span');
     const size = rand(1, 3);
@@ -121,7 +122,12 @@ function createAtmosphere() {
     star.style.left = `${rand(0, 100)}%`;
     star.style.top = `${rand(0, 100)}%`;
     star.style.opacity = `${rand(0.2, 0.7)}`;
-    
+    star.style.position = 'absolute';
+    star.style.borderRadius = '50%';
+    star.style.background = '#fff';
+    star.style.boxShadow = `0 0 ${rand(2,5)}px rgba(255,240,200,0.8)`;
+    star.style.pointerEvents = 'none';
+
     gsap.to(star, {
       opacity: rand(0.5, 1),
       duration: rand(2, 6),
@@ -129,6 +135,31 @@ function createAtmosphere() {
       yoyo: true,
       ease: 'sine.inOut',
       delay: rand(0, 5)
+    });
+    return star;
+  });
+
+  // Дополнительный слой мелких звёзд — плотное небо
+  buildAtmosphereLayer(starsContainer, 'star star--tiny', 120, () => {
+    const star = document.createElement('span');
+    const size = rand(0.5, 1.5);
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    star.style.left = `${rand(0, 100)}%`;
+    star.style.top = `${rand(0, 100)}%`;
+    star.style.opacity = `${rand(0.1, 0.45)}`;
+    star.style.position = 'absolute';
+    star.style.borderRadius = '50%';
+    star.style.background = 'rgba(255, 240, 210, 0.9)';
+    star.style.pointerEvents = 'none';
+
+    gsap.to(star, {
+      opacity: rand(0.3, 0.7),
+      duration: rand(3, 8),
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: rand(0, 8)
     });
     return star;
   });
@@ -170,7 +201,7 @@ function createAtmosphere() {
         onComplete: fly
       });
     }
-    
+
     setTimeout(fly, rand(0, 3000));
     return firefly;
   });
@@ -192,12 +223,12 @@ function showPrologue(lines) {
   const timeline = gsap.timeline();
   lineElements.forEach((line, index) => {
     timeline.to(line, {
-    opacity: 1,
-    y: index === 1 ? -150 : 0,
-    filter: 'blur(0px)',
-    duration: 0.9,
-    ease: 'power3.out'
-}, index === 0 ? 0 : '+=0.95');
+      opacity: 1,
+      y: index === 1 ? -150 : 0,
+      filter: 'blur(0px)',
+      duration: 0.9,
+      ease: 'power3.out'
+    }, index === 0 ? 0 : '+=0.95');
     timeline.to(line, { opacity: 0.88, duration: 1.2 }, '+=1.0');
   });
   return timeline;
@@ -332,22 +363,22 @@ function setupBlowScene() {
   finale.classList.add('is-visible');
   finale.setAttribute('aria-hidden', 'false');
   finaleMessage.textContent = TEXT.finale;
-  
+
   // Строгая очередь для надписей
   const textSeq = gsap.timeline();
-  
+
   // 1. Появляется "Этот день принадлежит только тебе"
   textSeq.to(cheerMain, { opacity: 1, duration: 1.2, ease: 'power2.out' }, '+=1.0');
-  
+
   // 2. Висит и исчезает
   textSeq.to(cheerMain, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, '+=2.8');
-  
+
   // 3. Появляется "С Днем Рождения!"
   textSeq.to(finale, { opacity: 1, duration: 1.2, ease: 'power2.out' }, '+=0.4');
-  
+
   // 4. Висит и исчезает (а затем выстраиваются светлячки)
   textSeq.to(finale, { opacity: 0, duration: 2.0, ease: 'power2.inOut', onComplete: formFireflyText }, '+=3.5');
-  
+
   // Скрываем торт с тенью, чтобы экран был полностью чистым для светлячков
   textSeq.to(document.getElementById('centerStage'), { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<');
 
@@ -394,21 +425,21 @@ function formFireflyText() {
   const h = window.innerHeight;
   canvas.width = w;
   canvas.height = h;
-  
+
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
-  
+
   const fontSize = Math.min(w * 0.22, 140);
   ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(text, w / 2, h / 2 - 20); // slightly above center
-  
+
   const data = ctx.getImageData(0, 0, w, h).data;
   const points = [];
   const step = Math.max(Math.floor(w / 280), 3);
-  
+
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
       const idx = (y * w + x) * 4;
@@ -417,13 +448,13 @@ function formFireflyText() {
       }
     }
   }
-  
+
   points.sort(() => Math.random() - 0.5);
   const maxPoints = 500;
   if (points.length > maxPoints) points.length = maxPoints;
-  
+
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
-  
+
   while (fireflies.length < points.length) {
     const firefly = document.createElement('span');
     firefly.className = 'firefly';
@@ -440,7 +471,7 @@ function formFireflyText() {
     particles.appendChild(firefly);
     fireflies.push(firefly);
   }
-  
+
   points.forEach((pt, i) => {
     const f = fireflies[i];
     gsap.killTweensOf(f);
@@ -466,7 +497,7 @@ function formFireflyText() {
       }
     });
   });
-  
+
   for (let i = points.length; i < fireflies.length; i++) {
     gsap.killTweensOf(fireflies[i]);
     gsap.to(fireflies[i], { opacity: 0, duration: 2, onComplete: () => fireflies[i].remove() });

@@ -520,6 +520,13 @@ button {
   animation: haloPulse 5s ease-in-out infinite;
 }
 
+/* Скрываем тень торта в финале */
+.scene.is-blown .cake-halo,
+.scene.is-dark .cake-halo {
+  opacity: 0 !important;
+  transition: opacity 1s ease;
+}
+
 .cake {
   position: relative;
   width: min(360px, 72vw);
@@ -1067,6 +1074,8 @@ button {
     padding-top: 8px;
   }
 }
+
+
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
