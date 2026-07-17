@@ -110,89 +110,72 @@ function buildAtmosphereLayer(container, className, count, factory) {
 }
 
 function createAtmosphere() {
-  buildAtmosphereLayer(particles, 'firefly', 18, () => {
-    const firefly = document.createElement('span');
-    const size = rand(2, 6);
-    firefly.style.width = `${size}px`;
-    firefly.style.height = `${size}px`;
-    firefly.style.left = `${rand(4, 96)}%`;
-    firefly.style.top = `${rand(8, 72)}%`;
-    firefly.style.opacity = `${rand(0.18, 0.8)}`;
-    return firefly;
+  const starsContainer = document.querySelector('.sky.stars');
+  
+  // Звёзды на заднем фоне (мерцающие точки)
+  buildAtmosphereLayer(starsContainer, 'star', 60, () => {
+    const star = document.createElement('span');
+    const size = rand(1, 3);
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    star.style.left = `${rand(0, 100)}%`;
+    star.style.top = `${rand(0, 100)}%`;
+    star.style.opacity = `${rand(0.2, 0.7)}`;
+    
+    gsap.to(star, {
+      opacity: rand(0.5, 1),
+      duration: rand(2, 6),
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: rand(0, 5)
+    });
+    return star;
   });
 
-  buildAtmosphereLayer(butterflies, 'butterfly', 18, () => {
-    const butterfly = document.createElement('span');
-    butterfly.style.left = `${rand(10, 90)}%`;
-    butterfly.style.top = `${rand(18, 72)}%`;
-    
+  // Яркие анимированные светлячки
+  buildAtmosphereLayer(particles, 'firefly', 35, () => {
+    const firefly = document.createElement('span');
+    const size = rand(3, 8);
+    firefly.style.width = `${size}px`;
+    firefly.style.height = `${size}px`;
+    firefly.style.left = `${rand(2, 98)}%`;
+    firefly.style.top = `${rand(5, 95)}%`;
+    firefly.style.opacity = `${rand(0.4, 0.8)}`;
+    firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
+    firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
+    firefly.style.mixBlendMode = 'screen';
+    firefly.style.zIndex = '50';
+
+    // Пульсация
+    gsap.to(firefly, {
+      opacity: rand(0.6, 1),
+      scale: rand(1.1, 1.6),
+      duration: rand(1.5, 4),
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: rand(0, 3)
+    });
+
+    // Плавный полёт
     function fly() {
-      const xMove = rand(-window.innerWidth * 0.4, window.innerWidth * 0.4);
-      const yMove = rand(-window.innerHeight * 0.3, window.innerHeight * 0.3);
-      const direction = xMove > 0 ? 1 : -1;
-      
-      gsap.to(butterfly, {
+      const xMove = rand(-window.innerWidth * 0.25, window.innerWidth * 0.25);
+      const yMove = rand(-window.innerHeight * 0.2, window.innerHeight * 0.2);
+      gsap.to(firefly, {
         x: `+=${xMove}`,
         y: `+=${yMove}`,
-        rotation: rand(-15, 15),
-        scaleX: direction,
-        duration: rand(8, 14),
+        duration: rand(12, 25),
         ease: 'sine.inOut',
         onComplete: fly
       });
     }
     
-    setTimeout(fly, rand(0, 2000));
-    return butterfly;
+    setTimeout(fly, rand(0, 3000));
+    return firefly;
   });
 
-  buildAtmosphereLayer(petals, 'petal', 24, () => {
-    const petal = document.createElement('span');
-    petal.style.left = `${rand(4, 96)}%`;
-    petal.style.top = `${rand(-10, 100)}vh`;
-    petal.style.opacity = `${rand(0.3, 0.8)}`;
-    
-    function fall() {
-      gsap.to(petal, {
-        y: window.innerHeight + 200,
-        x: `+=${rand(-100, 100)}`,
-        rotation: rand(-360, 360),
-        duration: rand(10, 18),
-        ease: 'none',
-        onComplete: () => {
-          gsap.set(petal, { y: -100, top: '-5vh', x: 0 });
-          fall();
-        }
-      });
-    }
-    fall();
-    
-    return petal;
-  });
-
-  buildAtmosphereLayer(leaves, 'leaf', 20, () => {
-    const leaf = document.createElement('span');
-    leaf.style.left = `${rand(2, 98)}%`;
-    leaf.style.top = `${rand(-10, 100)}vh`;
-    leaf.style.opacity = `${rand(0.35, 0.7)}`;
-    
-    function fall() {
-      gsap.to(leaf, {
-        y: window.innerHeight + 200,
-        x: `+=${rand(-120, 120)}`,
-        rotation: rand(-360, 360),
-        duration: rand(12, 22),
-        ease: 'none',
-        onComplete: () => {
-          gsap.set(leaf, { y: -100, top: '-5vh', x: 0 });
-          fall();
-        }
-      });
-    }
-    fall();
-    
-    return leaf;
-  });
+  // Зеленые лепестки (листья) удалены по просьбе пользователя
 }
 
 function setLoadingProgress(value) {
@@ -223,7 +206,7 @@ function showPrologue(lines) {
 function shapeScene() {
   const timeline = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
 
-  timeline.to(document.documentElement, { '--camera-scale': 0.96, duration: 1.1 }, 0);
+  timeline.to(document.documentElement, { '--camera-scale': 1.0, duration: 1.1 }, 0);
   timeline.to(document.documentElement, { '--camera-y': '-12px', duration: 1.1 }, 0);
   timeline.to(prologue, { opacity: 1, duration: 0.4 }, 0.1);
   timeline.add(showPrologue(TEXT.intro), 0.2);
@@ -231,8 +214,7 @@ function shapeScene() {
   timeline.to(document.documentElement, { '--camera-scale': 0.82, duration: 1.8 }, '>-0.2');
   timeline.to(document.documentElement, { '--camera-y': '10px', duration: 1.8 }, '<');
   timeline.to(document.documentElement, { '--camera-x': '0px', duration: 1.8 }, '<');
-  timeline.to(cheerMain, { opacity: 1, y: 0, duration: 1.1 }, '+=0.5');
-  timeline.to(hint, { opacity: 1, y: 0, duration: 1 }, '-=0.3');
+  timeline.to(hint, { opacity: 1, y: 0, duration: 1 }, '+=0.2');
   timeline.to(cake, { scale: 1, duration: 0.01 }, 0);
   timeline.to(cake, { rotate: 0, duration: 0.01 }, 0);
   timeline.to('.scene__camera', { filter: 'brightness(1) saturate(1)', duration: 0.01 }, 0);
@@ -333,10 +315,14 @@ function setupBlowScene() {
   STATE.finale = true;
 
   document.querySelector('.scene').classList.add('is-blown', 'is-dark');
-  gsap.to(document.documentElement, { '--camera-scale': 0.94, duration: 1.2, ease: 'power3.inOut' });
+  gsap.to(document.documentElement, { '--camera-scale': 1.0, duration: 1.2, ease: 'power3.inOut' });
   gsap.to(document.documentElement, { '--camera-y': '18px', duration: 1.2, ease: 'power3.inOut' });
   gsap.to('.candle__flame', { opacity: 0, scale: 0, duration: 0.5, stagger: 0.12, ease: 'power2.in' });
   gsap.to(cake, { filter: 'brightness(0.95) drop-shadow(0 0 10px rgba(241, 198, 90, 0.28))', duration: 0.8 });
+
+  // Убиваем возможные конфликтующие анимации письма и отключаем клики
+  gsap.killTweensOf([letterWrap, letter]);
+  gsap.set(letterWrap, { pointerEvents: 'none' });
 
   // Письмо полностью исчезает
   gsap.to(letterWrap, { opacity: 0, scale: 0.9, y: 40, duration: 1.0, ease: 'power2.inOut' });
@@ -346,7 +332,24 @@ function setupBlowScene() {
   finale.classList.add('is-visible');
   finale.setAttribute('aria-hidden', 'false');
   finaleMessage.textContent = TEXT.finale;
-  gsap.fromTo(finale, { opacity: 0 }, { opacity: 1, duration: 1.2, delay: 0.8, ease: 'power2.out' });
+  
+  // Строгая очередь для надписей
+  const textSeq = gsap.timeline();
+  
+  // 1. Появляется "Этот день принадлежит только тебе"
+  textSeq.to(cheerMain, { opacity: 1, duration: 1.2, ease: 'power2.out' }, '+=1.0');
+  
+  // 2. Висит и исчезает
+  textSeq.to(cheerMain, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, '+=2.8');
+  
+  // 3. Появляется "С Днем Рождения!"
+  textSeq.to(finale, { opacity: 1, duration: 1.2, ease: 'power2.out' }, '+=0.4');
+  
+  // 4. Висит и исчезает (а затем выстраиваются светлячки)
+  textSeq.to(finale, { opacity: 0, duration: 2.0, ease: 'power2.inOut', onComplete: formFireflyText }, '+=3.5');
+  
+  // Скрываем торт с тенью, чтобы экран был полностью чистым для светлячков
+  textSeq.to(document.getElementById('centerStage'), { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<');
 
   for (let index = 0; index < 120; index += 1) {
     const spark = document.createElement('span');
@@ -371,10 +374,103 @@ function setupBlowScene() {
   }
 
   setTimeout(() => {
-    for (let index = 0; index < 10; index += 1) {
-      window.setTimeout(() => launchFirework(), index * 700);
+    function fireworkWave() {
+      const count = Math.floor(rand(5, 10));
+      for (let index = 0; index < count; index += 1) {
+        window.setTimeout(() => launchFirework(), index * 700);
+      }
+      // Повторяем волну каждые 3–4 секунды бесконечно
+      setTimeout(fireworkWave, rand(3000, 4500));
     }
+    fireworkWave();
   }, 900);
+}
+
+function formFireflyText() {
+  const text = "Для Айши";
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+  
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+  
+  const fontSize = Math.min(w * 0.22, 140);
+  ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, w / 2, h / 2 - 20); // slightly above center
+  
+  const data = ctx.getImageData(0, 0, w, h).data;
+  const points = [];
+  const step = Math.max(Math.floor(w / 280), 3);
+  
+  for (let y = 0; y < h; y += step) {
+    for (let x = 0; x < w; x += step) {
+      const idx = (y * w + x) * 4;
+      if (data[idx] > 100) {
+        points.push({ x: x + rand(-0.5, 0.5), y: y + rand(-0.5, 0.5) });
+      }
+    }
+  }
+  
+  points.sort(() => Math.random() - 0.5);
+  const maxPoints = 500;
+  if (points.length > maxPoints) points.length = maxPoints;
+  
+  const fireflies = Array.from(document.querySelectorAll('.firefly'));
+  
+  while (fireflies.length < points.length) {
+    const firefly = document.createElement('span');
+    firefly.className = 'firefly';
+    const size = rand(3, 8);
+    firefly.style.width = `${size}px`;
+    firefly.style.height = `${size}px`;
+    firefly.style.left = `${rand(0, 100)}%`;
+    firefly.style.top = `${rand(0, 100)}%`;
+    firefly.style.opacity = '0';
+    firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
+    firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
+    firefly.style.mixBlendMode = 'screen';
+    firefly.style.zIndex = '50';
+    particles.appendChild(firefly);
+    fireflies.push(firefly);
+  }
+  
+  points.forEach((pt, i) => {
+    const f = fireflies[i];
+    gsap.killTweensOf(f);
+    gsap.to(f, {
+      left: `${pt.x}px`,
+      top: `${pt.y}px`,
+      x: 0,
+      y: 0,
+      opacity: rand(0.6, 1),
+      scale: rand(0.4, 0.8),
+      duration: rand(3.5, 6.0),
+      ease: 'power3.inOut',
+      onComplete: () => {
+        gsap.to(f, {
+          y: rand(-1.5, 1.5),
+          x: rand(-1.5, 1.5),
+          opacity: rand(0.6, 1),
+          duration: rand(1.5, 3),
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+      }
+    });
+  });
+  
+  for (let i = points.length; i < fireflies.length; i++) {
+    gsap.killTweensOf(fireflies[i]);
+    gsap.to(fireflies[i], { opacity: 0, duration: 2, onComplete: () => fireflies[i].remove() });
+  }
 }
 
 function launchFirework() {
@@ -408,15 +504,21 @@ function launchFirework() {
 }
 
 function bindHoverEffects() {
-  const hoverTargets = [cake, blowButton];
-  hoverTargets.forEach((element) => {
-    element.addEventListener('pointerenter', () => {
-      gsap.to(element, { scale: 1.03, duration: 0.25, ease: 'power2.out' });
-    });
+  // Wiggle при наведении на торт
+  cake.addEventListener('pointerenter', () => {
+    gsap.to(cake, { rotation: 2, duration: 0.12, ease: 'power1.out', yoyo: true, repeat: 5, onComplete: () => gsap.set(cake, { rotation: 0 }) });
+    gsap.to(cake, { scale: 1.05, duration: 0.25, ease: 'power2.out' });
+  });
+  cake.addEventListener('pointerleave', () => {
+    gsap.to(cake, { scale: 1, duration: 0.35, ease: 'power2.out' });
+  });
 
-    element.addEventListener('pointerleave', () => {
-      gsap.to(element, { scale: 1, duration: 0.35, ease: 'power2.out' });
-    });
+  // Обычный scale для кнопки задуть
+  blowButton.addEventListener('pointerenter', () => {
+    gsap.to(blowButton, { scale: 1.05, duration: 0.25, ease: 'power2.out' });
+  });
+  blowButton.addEventListener('pointerleave', () => {
+    gsap.to(blowButton, { scale: 1, duration: 0.35, ease: 'power2.out' });
   });
 }
 

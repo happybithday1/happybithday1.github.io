@@ -899,6 +899,14 @@ button {
   box-shadow: 0 0 18px rgba(255, 230, 160, 0.35);
 }
 
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
 .butterfly,
 .petal,
 .leaf {
@@ -906,43 +914,13 @@ button {
   pointer-events: none;
 }
 
+/* Теперь "бабочки" выглядят как летящие лепестки */
 .butterfly {
-  width: 20px;
-  height: 14px;
-  filter: drop-shadow(0 0 8px rgba(255, 214, 120, 0.5));
-}
-
-.butterfly::before,
-.butterfly::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 9px;
-  height: 14px;
+  width: 18px;
+  height: 10px;
   border-radius: 100% 0 100% 0;
-  background: linear-gradient(180deg, rgba(248, 234, 192, 0.9), rgba(211, 164, 71, 0.7));
-}
-
-@keyframes flapLeft {
-  0%, 100% { transform: rotate(25deg) rotateY(0deg); }
-  50% { transform: rotate(25deg) rotateY(65deg); }
-}
-
-@keyframes flapRight {
-  0%, 100% { transform: scaleX(-1) rotate(25deg) rotateY(0deg); }
-  50% { transform: scaleX(-1) rotate(25deg) rotateY(65deg); }
-}
-
-.butterfly::before {
-  left: 0;
-  transform-origin: right center;
-  animation: flapLeft 0.15s infinite ease-in-out;
-}
-
-.butterfly::after {
-  right: 0;
-  transform-origin: right center;
-  animation: flapRight 0.15s infinite ease-in-out;
+  background: linear-gradient(180deg, rgba(225, 158, 141, 0.94), rgba(157, 64, 73, 0.92));
+  box-shadow: 0 0 10px rgba(255, 145, 161, 0.2);
 }
 
 .petal {
