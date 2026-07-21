@@ -486,7 +486,8 @@ button {
   letter-spacing: 0.04em;
   color: #f2e6d0;
   opacity: 0;
-  transform: translateY(22px) blur(16px);
+  transform: translateY(22px);
+  filter: blur(16px);
 }
 
 .prologue__line.is-active {

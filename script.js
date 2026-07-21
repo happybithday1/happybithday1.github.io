@@ -486,7 +486,7 @@ function formFireflyText() {
     firefly.style.opacity = '0';
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
     firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
-    firefly.style.mixBlendMode = 'screen';
+    if (!IS_MOBILE) firefly.style.mixBlendMode = 'screen';
     firefly.style.zIndex = '50';
     particles.appendChild(firefly);
     fireflies.push(firefly);
@@ -495,9 +495,24 @@ function formFireflyText() {
   points.forEach((pt, i) => {
     const f = fireflies[i];
     gsap.killTweensOf(f);
+
+    // Считываем текущее визуальное положение ДО изменения стилей
+    const rect = f.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top  + rect.height / 2;
+
+    // Фиксируем layout-позицию один раз через gsap.set (без анимации)
+    // и компенсируем смещение через transform, чтобы элемент
+    // визуально не прыгнул. Все дальнейшие движения — только x/y
+    // (GPU transform, без layout reflow на каждом кадре).
+    gsap.set(f, {
+      left: pt.x,
+      top:  pt.y,
+      x:    cx - pt.x,
+      y:    cy - pt.y,
+    });
+
     gsap.to(f, {
-      left: `${pt.x}px`,
-      top: `${pt.y}px`,
       x: 0,
       y: 0,
       opacity: rand(0.6, 1),
