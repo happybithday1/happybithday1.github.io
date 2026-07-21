@@ -220,11 +220,14 @@ function showPrologue(lines) {
     line.textContent = lines[index] ?? '';
   });
 
+  const isMobile = window.innerWidth < 640;
+  const line1Y = isMobile ? -72 : -150;
+
   const timeline = gsap.timeline();
   lineElements.forEach((line, index) => {
     timeline.to(line, {
       opacity: 1,
-      y: index === 1 ? -150 : 0,
+      y: index === 1 ? line1Y : 0,
       filter: 'blur(0px)',
       duration: 0.9,
       ease: 'power3.out'
@@ -235,6 +238,8 @@ function showPrologue(lines) {
 }
 
 function shapeScene() {
+  const isMobile = window.innerWidth < 640;
+  const finalScale = isMobile ? 0.97 : 0.82;
   const timeline = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
 
   timeline.to(document.documentElement, { '--camera-scale': 1.0, duration: 1.1 }, 0);
@@ -242,7 +247,7 @@ function shapeScene() {
   timeline.to(prologue, { opacity: 1, duration: 0.4 }, 0.1);
   timeline.add(showPrologue(TEXT.intro), 0.2);
   timeline.to(prologue, { opacity: 0, duration: 0.8 }, '+=0.5');
-  timeline.to(document.documentElement, { '--camera-scale': 0.82, duration: 1.8 }, '>-0.2');
+  timeline.to(document.documentElement, { '--camera-scale': finalScale, duration: 1.8 }, '>-0.2');
   timeline.to(document.documentElement, { '--camera-y': '10px', duration: 1.8 }, '<');
   timeline.to(document.documentElement, { '--camera-x': '0px', duration: 1.8 }, '<');
   timeline.to(hint, { opacity: 1, y: 0, duration: 1 }, '+=0.2');
@@ -314,8 +319,9 @@ function revealLetter() {
   const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
   // Камера плавно приближается
-  timeline.to(document.documentElement, { '--camera-scale': 1.06, duration: 1.6, ease: 'power2.inOut' }, 0);
-  timeline.to(document.documentElement, { '--camera-y': '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
+  const isMobile = window.innerWidth < 640;
+  timeline.to(document.documentElement, { '--camera-scale': isMobile ? 1.0 : 1.06, duration: 1.6, ease: 'power2.inOut' }, 0);
+  timeline.to(document.documentElement, { '--camera-y': isMobile ? '-4px' : '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
   timeline.to(camera, { filter: 'brightness(1.08) saturate(1.06)', duration: 1.4 }, 0);
 
   // Скрываем всё лишнее плавно
