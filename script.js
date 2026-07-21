@@ -46,6 +46,8 @@ if (typeof window.Lenis === 'undefined') {
   };
 }
 
+const IS_MOBILE = window.innerWidth < 640 || ('ontouchstart' in window && window.innerWidth < 900);
+
 const STATE = {
   opened: false,
   finale: false,
@@ -113,8 +115,13 @@ function buildAtmosphereLayer(container, className, count, factory) {
 function createAtmosphere() {
   const starsContainer = document.querySelector('.sky.stars');
 
+  // На мобильных снижаем количество элементов для плавности
+  const starCount      = IS_MOBILE ? 25 : 60;
+  const tinyStarCount  = IS_MOBILE ? 45 : 120;
+  const fireflyCount   = IS_MOBILE ? 10 : 35;
+
   // Основной звёздный слой (мерцающие точки)
-  buildAtmosphereLayer(starsContainer, 'star', 60, () => {
+  buildAtmosphereLayer(starsContainer, 'star', starCount, () => {
     const star = document.createElement('span');
     const size = rand(1, 3);
     star.style.width = `${size}px`;
@@ -130,7 +137,7 @@ function createAtmosphere() {
 
     gsap.to(star, {
       opacity: rand(0.5, 1),
-      duration: rand(2, 6),
+      duration: rand(IS_MOBILE ? 3 : 2, IS_MOBILE ? 8 : 6),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
@@ -140,7 +147,7 @@ function createAtmosphere() {
   });
 
   // Дополнительный слой мелких звёзд — плотное небо
-  buildAtmosphereLayer(starsContainer, 'star star--tiny', 120, () => {
+  buildAtmosphereLayer(starsContainer, 'star star--tiny', tinyStarCount, () => {
     const star = document.createElement('span');
     const size = rand(0.5, 1.5);
     star.style.width = `${size}px`;
@@ -155,7 +162,7 @@ function createAtmosphere() {
 
     gsap.to(star, {
       opacity: rand(0.3, 0.7),
-      duration: rand(3, 8),
+      duration: rand(IS_MOBILE ? 5 : 3, IS_MOBILE ? 10 : 8),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
@@ -165,7 +172,7 @@ function createAtmosphere() {
   });
 
   // Яркие анимированные светлячки
-  buildAtmosphereLayer(particles, 'firefly', 35, () => {
+  buildAtmosphereLayer(particles, 'firefly', fireflyCount, () => {
     const firefly = document.createElement('span');
     const size = rand(3, 8);
     firefly.style.width = `${size}px`;
@@ -175,28 +182,31 @@ function createAtmosphere() {
     firefly.style.opacity = `${rand(0.4, 0.8)}`;
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
     firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
-    firefly.style.mixBlendMode = 'screen';
+    // mix-blend-mode: screen очень дорог на мобильном GPU — отключаем
+    if (!IS_MOBILE) firefly.style.mixBlendMode = 'screen';
     firefly.style.zIndex = '50';
 
-    // Пульсация
+    // Пульсация — на мобиле замедляем для плавности
     gsap.to(firefly, {
       opacity: rand(0.6, 1),
-      scale: rand(1.1, 1.6),
-      duration: rand(1.5, 4),
+      scale: rand(1.05, 1.4),
+      duration: rand(IS_MOBILE ? 2.5 : 1.5, IS_MOBILE ? 5 : 4),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
       delay: rand(0, 3)
     });
 
-    // Плавный полёт
+    // Плавный полёт — на мобиле медленнее и короче
     function fly() {
-      const xMove = rand(-window.innerWidth * 0.25, window.innerWidth * 0.25);
-      const yMove = rand(-window.innerHeight * 0.2, window.innerHeight * 0.2);
+      const range = IS_MOBILE ? 0.15 : 0.25;
+      const dur   = rand(IS_MOBILE ? 18 : 12, IS_MOBILE ? 32 : 25);
+      const xMove = rand(-window.innerWidth * range, window.innerWidth * range);
+      const yMove = rand(-window.innerHeight * range, window.innerHeight * range);
       gsap.to(firefly, {
         x: `+=${xMove}`,
         y: `+=${yMove}`,
-        duration: rand(12, 25),
+        duration: dur,
         ease: 'sine.inOut',
         onComplete: fly
       });
@@ -388,7 +398,8 @@ function setupBlowScene() {
   // Скрываем торт с тенью, чтобы экран был полностью чистым для светлячков
   textSeq.to(document.getElementById('centerStage'), { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<');
 
-  for (let index = 0; index < 120; index += 1) {
+  const sparkCount = IS_MOBILE ? 50 : 120;
+  for (let index = 0; index < sparkCount; index += 1) {
     const spark = document.createElement('span');
     spark.className = 'finale__spark';
     spark.style.left = `${rand(10, 90)}vw`;
@@ -412,12 +423,15 @@ function setupBlowScene() {
 
   setTimeout(() => {
     function fireworkWave() {
-      const count = Math.floor(rand(5, 10));
+      const count = IS_MOBILE
+        ? Math.floor(rand(2, 4))
+        : Math.floor(rand(5, 10));
+      const interval = IS_MOBILE ? 1000 : 700;
       for (let index = 0; index < count; index += 1) {
-        window.setTimeout(() => launchFirework(), index * 700);
+        window.setTimeout(() => launchFirework(), index * interval);
       }
-      // Повторяем волну каждые 3–4 секунды бесконечно
-      setTimeout(fireworkWave, rand(3000, 4500));
+      // Повторяем волну каждые 3–6 секунд (реже на мобиле)
+      setTimeout(fireworkWave, rand(IS_MOBILE ? 4500 : 3000, IS_MOBILE ? 6500 : 4500));
     }
     fireworkWave();
   }, 900);
@@ -456,7 +470,7 @@ function formFireflyText() {
   }
 
   points.sort(() => Math.random() - 0.5);
-  const maxPoints = 500;
+  const maxPoints = IS_MOBILE ? 180 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -514,20 +528,21 @@ function launchFirework() {
   const originX = rand(window.innerWidth * 0.2, window.innerWidth * 0.8);
   const originY = rand(window.innerHeight * 0.2, window.innerHeight * 0.55);
   const colors = ['#ffd774', '#ffefb6', '#ffb95c', '#f2d48a'];
+  const particleCount = IS_MOBILE ? 16 : 32;
 
-  for (let index = 0; index < 32; index += 1) {
+  for (let index = 0; index < particleCount; index += 1) {
     const spark = document.createElement('span');
     spark.className = 'finale__spark';
     spark.style.left = `${originX}px`;
     spark.style.top = `${originY}px`;
     spark.style.background = choose(colors);
-    spark.style.boxShadow = `0 0 18px ${choose(colors)}`;
+    if (!IS_MOBILE) spark.style.boxShadow = `0 0 18px ${choose(colors)}`;
     spark.style.width = `${rand(2, 4)}px`;
     spark.style.height = spark.style.width;
     finaleSky.appendChild(spark);
 
-    const angle = (Math.PI * 2 * index) / 32;
-    const distance = rand(70, 190);
+    const angle = (Math.PI * 2 * index) / particleCount;
+    const distance = rand(IS_MOBILE ? 50 : 70, IS_MOBILE ? 130 : 190);
     gsap.to(spark, {
       x: Math.cos(angle) * distance,
       y: Math.sin(angle) * distance,

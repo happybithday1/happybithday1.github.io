@@ -1023,6 +1023,23 @@ button {
   .letter-wrap {
     top: 50%;
   }
+
+  /* GPU-хинты для плавных анимаций на планшетах и телефонах */
+  .scene__camera,
+  .cake,
+  .cake-halo,
+  .prologue,
+  .cheer,
+  .letter-wrap,
+  .finale {
+    will-change: transform, opacity;
+  }
+
+  /* Туман — убираем дорогой blur, оставляем форму */
+  .fog {
+    filter: none;
+    opacity: 0.45;
+  }
 }
 
 @media (max-width: 640px) {
