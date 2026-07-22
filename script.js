@@ -424,14 +424,14 @@ function setupBlowScene() {
   setTimeout(() => {
     function fireworkWave() {
       const count = IS_MOBILE
-        ? Math.floor(rand(2, 4))
+        ? Math.floor(rand(5, 8))
         : Math.floor(rand(5, 10));
-      const interval = IS_MOBILE ? 1000 : 700;
+      const interval = IS_MOBILE ? 600 : 700;
       for (let index = 0; index < count; index += 1) {
         window.setTimeout(() => launchFirework(), index * interval);
       }
-      // Повторяем волну каждые 3–6 секунд (реже на мобиле)
-      setTimeout(fireworkWave, rand(IS_MOBILE ? 4500 : 3000, IS_MOBILE ? 6500 : 4500));
+      // Повторяем волну каждые 2.5–4 секунды
+      setTimeout(fireworkWave, rand(IS_MOBILE ? 2500 : 3000, IS_MOBILE ? 4000 : 4500));
     }
     fireworkWave();
   }, 900);
@@ -449,7 +449,10 @@ function formFireflyText() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
 
-  const fontSize = Math.min(w * 0.22, 140);
+  // На мобиле шрифт крупнее, чтобы буквы были читаемы
+  const fontSize = IS_MOBILE
+    ? Math.min(w * 0.30, 120)
+    : Math.min(w * 0.22, 140);
   ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
@@ -458,7 +461,8 @@ function formFireflyText() {
 
   const data = ctx.getImageData(0, 0, w, h).data;
   const points = [];
-  const step = Math.max(Math.floor(w / 280), 3);
+  // На мобиле шаг мельче → больше точек попадает в буквы
+  const step = IS_MOBILE ? 2 : Math.max(Math.floor(w / 280), 3);
 
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
@@ -470,7 +474,8 @@ function formFireflyText() {
   }
 
   points.sort(() => Math.random() - 0.5);
-  const maxPoints = IS_MOBILE ? 180 : 500;
+  // Больше точек на мобиле → текст читаемее
+  const maxPoints = IS_MOBILE ? 320 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -478,14 +483,17 @@ function formFireflyText() {
   while (fireflies.length < points.length) {
     const firefly = document.createElement('span');
     firefly.className = 'firefly';
-    const size = rand(3, 8);
+    // На мобиле точки крупнее — буквы видны отчётливее
+    const size = IS_MOBILE ? rand(5, 11) : rand(3, 8);
     firefly.style.width = `${size}px`;
     firefly.style.height = `${size}px`;
     firefly.style.left = `${rand(0, 100)}%`;
     firefly.style.top = `${rand(0, 100)}%`;
     firefly.style.opacity = '0';
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
-    firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
+    firefly.style.boxShadow = IS_MOBILE
+      ? `0 0 ${rand(8, 18)}px rgba(255, 220, 80, 1)`
+      : `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
     if (!IS_MOBILE) firefly.style.mixBlendMode = 'screen';
     firefly.style.zIndex = '50';
     particles.appendChild(firefly);
