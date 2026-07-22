@@ -481,7 +481,7 @@ function formFireflyText() {
 
   points.sort(() => Math.random() - 0.5);
   // 240 точек — баланс между читаемостью и плавностью
-  const maxPoints = IS_MOBILE ? 240 : 500;
+  const maxPoints = IS_MOBILE ? 300 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -489,8 +489,8 @@ function formFireflyText() {
   while (fireflies.length < points.length) {
     const firefly = document.createElement('span');
     firefly.className = 'firefly';
-    // На мобиле точки крупнее — буквы видны отчётливее
-    const size = IS_MOBILE ? rand(5, 11) : rand(3, 8);
+    // На мобиле чуть крупнее чем на ПК, но не настолько чтобы сливаться
+    const size = IS_MOBILE ? rand(3, 7) : rand(3, 8);
     firefly.style.width = `${size}px`;
     firefly.style.height = `${size}px`;
     firefly.style.left = `${rand(0, 100)}%`;
