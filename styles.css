@@ -1096,9 +1096,11 @@ button {
     font-size: clamp(1rem, 4.2vw, 1.4rem);
   }
 
-  /* Center stage */
+  /* Center stage — используем svh чтобы торт не обрезался браузерной шапкой */
   .center-stage {
-    bottom: 7vh;
+    bottom: auto;
+    top: 50svh;
+    transform: translateX(-50%) translateY(-46%);
     height: 42vh;
     width: min(380px, 90vw);
   }
@@ -1139,6 +1141,8 @@ button {
     width: 14px;
     height: 21px;
     top: -15px;
+    /* Замедляем мерцание — на мобиле 2.8s выглядит дёргано */
+    animation-duration: 5s;
   }
 
   .cake-halo {
