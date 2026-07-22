@@ -449,20 +449,26 @@ function formFireflyText() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
 
-  // На мобиле шрифт крупнее, чтобы буквы были читаемы
-  const fontSize = IS_MOBILE
-    ? Math.min(w * 0.30, 120)
-    : Math.min(w * 0.22, 140);
+  // Вычисляем размер шрифта: сначала пробный, потом масштабируем,
+  // чтобы текст гарантированно влезал в экран с отступами.
+  const hPad = w * (IS_MOBILE ? 0.07 : 0.05); // горизонтальный отступ
+  const maxTextWidth = w - hPad * 2;
+  let fontSize = IS_MOBILE ? Math.min(w * 0.26, 110) : Math.min(w * 0.22, 140);
+  ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
+  const measured = ctx.measureText(text);
+  if (measured.width > maxTextWidth) {
+    fontSize = fontSize * (maxTextWidth / measured.width);
+  }
   ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, w / 2, h / 2 - 20); // slightly above center
+  ctx.fillText(text, w / 2, h / 2 - 20);
 
   const data = ctx.getImageData(0, 0, w, h).data;
   const points = [];
-  // На мобиле шаг мельче → больше точек попадает в буквы
-  const step = IS_MOBILE ? 2 : Math.max(Math.floor(w / 280), 3);
+  // На мобиле шаг мельче — более заполненные буквы, но не слишком
+  const step = IS_MOBILE ? 3 : Math.max(Math.floor(w / 280), 3);
 
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
@@ -474,8 +480,8 @@ function formFireflyText() {
   }
 
   points.sort(() => Math.random() - 0.5);
-  // Больше точек на мобиле → текст читаемее
-  const maxPoints = IS_MOBILE ? 320 : 500;
+  // 240 точек — баланс между читаемостью и плавностью
+  const maxPoints = IS_MOBILE ? 240 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -491,9 +497,8 @@ function formFireflyText() {
     firefly.style.top = `${rand(0, 100)}%`;
     firefly.style.opacity = '0';
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
-    firefly.style.boxShadow = IS_MOBILE
-      ? `0 0 ${rand(8, 18)}px rgba(255, 220, 80, 1)`
-      : `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
+    // boxShadow очень дорог на мобильном GPU — убираем для текстовых светлячков
+    if (!IS_MOBILE) firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
     if (!IS_MOBILE) firefly.style.mixBlendMode = 'screen';
     firefly.style.zIndex = '50';
     particles.appendChild(firefly);
