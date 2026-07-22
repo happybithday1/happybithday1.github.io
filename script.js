@@ -604,6 +604,10 @@ function bindHoverEffects() {
 
 function bindParallax() {
   window.addEventListener('pointermove', (event) => {
+    // На мобиле pointermove срабатывает при каждом касании —
+    // параллакс тумана и камеры не нужен, пропускаем полностью
+    if (IS_MOBILE) return;
+
     cursorX = event.clientX;
     cursorY = event.clientY;
     setRootPosition(cursorX, cursorY);

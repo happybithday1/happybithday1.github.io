@@ -1199,6 +1199,30 @@ button {
     font-size: clamp(1.9rem, 8.5vw, 3.4rem);
     padding: 0 16px;
   }
+
+  /* ─── Производительность: отключаем тяжёлые фоновые анимации ─── */
+
+  /* Дрейф звёздного фона — незаметен на мобиле, но грузит GPU */
+  .sky.stars {
+    animation: none;
+  }
+
+  /* Движение тумана — fog уже без blur на мобиле, двигать нечего */
+  .fog::before,
+  .fog::after {
+    animation: none;
+  }
+
+  /* Медленное мерцание освещения — очень тонкий эффект, не нужен */
+  .lights {
+    animation: none;
+  }
+
+  /* Медленный дрейф облаков/частиц */
+  .particles::before,
+  .particles::after {
+    animation: none;
+  }
 }
 
 
