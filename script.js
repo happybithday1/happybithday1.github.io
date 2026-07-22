@@ -705,6 +705,40 @@ function initEvents() {
   });
 
   blowButton.addEventListener('click', setupBlowScene);
+
+  // ── Свайп для мобильных ──────────────────────────────────────────
+  // Свайп вверх или вправо работает как нажатие на активный элемент:
+  //   сцена с тортом  → открыть письмо
+  //   сцена с письмом → задуть свечу (финал)
+  if (IS_MOBILE) {
+    let swipeTouchStartX = 0;
+    let swipeTouchStartY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      swipeTouchStartX = e.changedTouches[0].clientX;
+      swipeTouchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - swipeTouchStartX;
+      const dy = e.changedTouches[0].clientY - swipeTouchStartY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      const threshold = 55; // минимальная длина свайпа в px
+
+      // Только чёткий горизонтальный или вертикальный свайп
+      const isHorizontal = absDx > absDy && absDx > threshold;
+      const isUpward     = absDy > absDx && dy < -threshold;
+
+      if (isHorizontal || isUpward) {
+        if (!STATE.opened && STATE.ready) {
+          revealLetter();
+        } else if (STATE.opened && !STATE.finale) {
+          setupBlowScene();
+        }
+      }
+    }, { passive: true });
+  }
 }
 
 function initCursor() {

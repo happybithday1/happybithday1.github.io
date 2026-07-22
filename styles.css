@@ -1178,20 +1178,24 @@ button {
   }
 
   .letter__title {
-    font-size: clamp(1.5rem, 6vw, 2.2rem);
-    margin-bottom: 10px;
+    font-size: clamp(1.6rem, 6.5vw, 2.4rem);
+    margin-bottom: 12px;
   }
 
   .letter__text {
-    font-size: 0.88rem;
-    line-height: 1.7;
+    font-size: 1rem;
+    line-height: 1.85;
     max-width: none;
   }
 
+  /* Кнопка соответствует рекомендации Apple/Google — минимум 48px высоты */
   .letter__button {
-    padding: 12px 24px;
-    font-size: 0.93rem;
-    margin-top: 12px;
+    padding: 14px 32px;
+    min-height: 48px;
+    font-size: 1.05rem;
+    margin-top: 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Finale */
