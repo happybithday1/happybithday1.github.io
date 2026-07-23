@@ -46,6 +46,8 @@ if (typeof window.Lenis === 'undefined') {
   };
 }
 
+const IS_MOBILE = window.innerWidth < 640 || ('ontouchstart' in window && window.innerWidth < 900);
+
 const STATE = {
   opened: false,
   finale: false,
@@ -113,8 +115,13 @@ function buildAtmosphereLayer(container, className, count, factory) {
 function createAtmosphere() {
   const starsContainer = document.querySelector('.sky.stars');
 
+  // На мобильных снижаем количество элементов для плавности
+  const starCount      = IS_MOBILE ? 25 : 60;
+  const tinyStarCount  = IS_MOBILE ? 45 : 120;
+  const fireflyCount   = IS_MOBILE ? 10 : 35;
+
   // Основной звёздный слой (мерцающие точки)
-  buildAtmosphereLayer(starsContainer, 'star', 60, () => {
+  buildAtmosphereLayer(starsContainer, 'star', starCount, () => {
     const star = document.createElement('span');
     const size = rand(1, 3);
     star.style.width = `${size}px`;
@@ -130,7 +137,7 @@ function createAtmosphere() {
 
     gsap.to(star, {
       opacity: rand(0.5, 1),
-      duration: rand(2, 6),
+      duration: rand(IS_MOBILE ? 3 : 2, IS_MOBILE ? 8 : 6),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
@@ -140,7 +147,7 @@ function createAtmosphere() {
   });
 
   // Дополнительный слой мелких звёзд — плотное небо
-  buildAtmosphereLayer(starsContainer, 'star star--tiny', 120, () => {
+  buildAtmosphereLayer(starsContainer, 'star star--tiny', tinyStarCount, () => {
     const star = document.createElement('span');
     const size = rand(0.5, 1.5);
     star.style.width = `${size}px`;
@@ -155,7 +162,7 @@ function createAtmosphere() {
 
     gsap.to(star, {
       opacity: rand(0.3, 0.7),
-      duration: rand(3, 8),
+      duration: rand(IS_MOBILE ? 5 : 3, IS_MOBILE ? 10 : 8),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
@@ -165,7 +172,7 @@ function createAtmosphere() {
   });
 
   // Яркие анимированные светлячки
-  buildAtmosphereLayer(particles, 'firefly', 35, () => {
+  buildAtmosphereLayer(particles, 'firefly', fireflyCount, () => {
     const firefly = document.createElement('span');
     const size = rand(3, 8);
     firefly.style.width = `${size}px`;
@@ -175,28 +182,31 @@ function createAtmosphere() {
     firefly.style.opacity = `${rand(0.4, 0.8)}`;
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
     firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
-    firefly.style.mixBlendMode = 'screen';
+    // mix-blend-mode: screen очень дорог на мобильном GPU — отключаем
+    if (!IS_MOBILE) firefly.style.mixBlendMode = 'screen';
     firefly.style.zIndex = '50';
 
-    // Пульсация
+    // Пульсация — на мобиле замедляем для плавности
     gsap.to(firefly, {
       opacity: rand(0.6, 1),
-      scale: rand(1.1, 1.6),
-      duration: rand(1.5, 4),
+      scale: rand(1.05, 1.4),
+      duration: rand(IS_MOBILE ? 2.5 : 1.5, IS_MOBILE ? 5 : 4),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
       delay: rand(0, 3)
     });
 
-    // Плавный полёт
+    // Плавный полёт — на мобиле медленнее и короче
     function fly() {
-      const xMove = rand(-window.innerWidth * 0.25, window.innerWidth * 0.25);
-      const yMove = rand(-window.innerHeight * 0.2, window.innerHeight * 0.2);
+      const range = IS_MOBILE ? 0.15 : 0.25;
+      const dur   = rand(IS_MOBILE ? 18 : 12, IS_MOBILE ? 32 : 25);
+      const xMove = rand(-window.innerWidth * range, window.innerWidth * range);
+      const yMove = rand(-window.innerHeight * range, window.innerHeight * range);
       gsap.to(firefly, {
         x: `+=${xMove}`,
         y: `+=${yMove}`,
-        duration: rand(12, 25),
+        duration: dur,
         ease: 'sine.inOut',
         onComplete: fly
       });
@@ -220,11 +230,14 @@ function showPrologue(lines) {
     line.textContent = lines[index] ?? '';
   });
 
+  const isMobile = window.innerWidth < 640;
+  const line1Y = isMobile ? -72 : -150;
+
   const timeline = gsap.timeline();
   lineElements.forEach((line, index) => {
     timeline.to(line, {
       opacity: 1,
-      y: index === 1 ? -150 : 0,
+      y: index === 1 ? line1Y : 0,
       filter: 'blur(0px)',
       duration: 0.9,
       ease: 'power3.out'
@@ -235,6 +248,8 @@ function showPrologue(lines) {
 }
 
 function shapeScene() {
+  const isMobile = window.innerWidth < 640;
+  const finalScale = isMobile ? 0.97 : 0.82;
   const timeline = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
 
   timeline.to(document.documentElement, { '--camera-scale': 1.0, duration: 1.1 }, 0);
@@ -242,7 +257,7 @@ function shapeScene() {
   timeline.to(prologue, { opacity: 1, duration: 0.4 }, 0.1);
   timeline.add(showPrologue(TEXT.intro), 0.2);
   timeline.to(prologue, { opacity: 0, duration: 0.8 }, '+=0.5');
-  timeline.to(document.documentElement, { '--camera-scale': 0.82, duration: 1.8 }, '>-0.2');
+  timeline.to(document.documentElement, { '--camera-scale': finalScale, duration: 1.8 }, '>-0.2');
   timeline.to(document.documentElement, { '--camera-y': '10px', duration: 1.8 }, '<');
   timeline.to(document.documentElement, { '--camera-x': '0px', duration: 1.8 }, '<');
   timeline.to(hint, { opacity: 1, y: 0, duration: 1 }, '+=0.2');
@@ -314,8 +329,9 @@ function revealLetter() {
   const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
   // Камера плавно приближается
-  timeline.to(document.documentElement, { '--camera-scale': 1.06, duration: 1.6, ease: 'power2.inOut' }, 0);
-  timeline.to(document.documentElement, { '--camera-y': '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
+  const isMobile = window.innerWidth < 640;
+  timeline.to(document.documentElement, { '--camera-scale': isMobile ? 1.0 : 1.06, duration: 1.6, ease: 'power2.inOut' }, 0);
+  timeline.to(document.documentElement, { '--camera-y': isMobile ? '-4px' : '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
   timeline.to(camera, { filter: 'brightness(1.08) saturate(1.06)', duration: 1.4 }, 0);
 
   // Скрываем всё лишнее плавно
@@ -382,7 +398,8 @@ function setupBlowScene() {
   // Скрываем торт с тенью, чтобы экран был полностью чистым для светлячков
   textSeq.to(document.getElementById('centerStage'), { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<');
 
-  for (let index = 0; index < 120; index += 1) {
+  const sparkCount = IS_MOBILE ? 50 : 120;
+  for (let index = 0; index < sparkCount; index += 1) {
     const spark = document.createElement('span');
     spark.className = 'finale__spark';
     spark.style.left = `${rand(10, 90)}vw`;
@@ -406,12 +423,15 @@ function setupBlowScene() {
 
   setTimeout(() => {
     function fireworkWave() {
-      const count = Math.floor(rand(5, 10));
+      const count = IS_MOBILE
+        ? Math.floor(rand(5, 8))
+        : Math.floor(rand(5, 10));
+      const interval = IS_MOBILE ? 600 : 700;
       for (let index = 0; index < count; index += 1) {
-        window.setTimeout(() => launchFirework(), index * 700);
+        window.setTimeout(() => launchFirework(), index * interval);
       }
-      // Повторяем волну каждые 3–4 секунды бесконечно
-      setTimeout(fireworkWave, rand(3000, 4500));
+      // Повторяем волну каждые 2.5–4 секунды
+      setTimeout(fireworkWave, rand(IS_MOBILE ? 2500 : 3000, IS_MOBILE ? 4000 : 4500));
     }
     fireworkWave();
   }, 900);
@@ -429,16 +449,26 @@ function formFireflyText() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
 
-  const fontSize = Math.min(w * 0.22, 140);
+  // Вычисляем размер шрифта: сначала пробный, потом масштабируем,
+  // чтобы текст гарантированно влезал в экран с отступами.
+  const hPad = w * (IS_MOBILE ? 0.07 : 0.05); // горизонтальный отступ
+  const maxTextWidth = w - hPad * 2;
+  let fontSize = IS_MOBILE ? Math.min(w * 0.26, 110) : Math.min(w * 0.22, 140);
+  ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
+  const measured = ctx.measureText(text);
+  if (measured.width > maxTextWidth) {
+    fontSize = fontSize * (maxTextWidth / measured.width);
+  }
   ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, w / 2, h / 2 - 20); // slightly above center
+  ctx.fillText(text, w / 2, h / 2 - 20);
 
   const data = ctx.getImageData(0, 0, w, h).data;
   const points = [];
-  const step = Math.max(Math.floor(w / 280), 3);
+  // На мобиле шаг мельче — более заполненные буквы, но не слишком
+  const step = IS_MOBILE ? 3 : Math.max(Math.floor(w / 280), 3);
 
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
@@ -450,7 +480,8 @@ function formFireflyText() {
   }
 
   points.sort(() => Math.random() - 0.5);
-  const maxPoints = 500;
+  // 240 точек — баланс между читаемостью и плавностью
+  const maxPoints = IS_MOBILE ? 300 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -458,15 +489,17 @@ function formFireflyText() {
   while (fireflies.length < points.length) {
     const firefly = document.createElement('span');
     firefly.className = 'firefly';
-    const size = rand(3, 8);
+    // На мобиле чуть крупнее чем на ПК, но не настолько чтобы сливаться
+    const size = IS_MOBILE ? rand(3, 7) : rand(3, 8);
     firefly.style.width = `${size}px`;
     firefly.style.height = `${size}px`;
     firefly.style.left = `${rand(0, 100)}%`;
     firefly.style.top = `${rand(0, 100)}%`;
     firefly.style.opacity = '0';
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
-    firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
-    firefly.style.mixBlendMode = 'screen';
+    // boxShadow очень дорог на мобильном GPU — убираем для текстовых светлячков
+    if (!IS_MOBILE) firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
+    if (!IS_MOBILE) firefly.style.mixBlendMode = 'screen';
     firefly.style.zIndex = '50';
     particles.appendChild(firefly);
     fireflies.push(firefly);
@@ -475,9 +508,24 @@ function formFireflyText() {
   points.forEach((pt, i) => {
     const f = fireflies[i];
     gsap.killTweensOf(f);
+
+    // Считываем текущее визуальное положение ДО изменения стилей
+    const rect = f.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top  + rect.height / 2;
+
+    // Фиксируем layout-позицию один раз через gsap.set (без анимации)
+    // и компенсируем смещение через transform, чтобы элемент
+    // визуально не прыгнул. Все дальнейшие движения — только x/y
+    // (GPU transform, без layout reflow на каждом кадре).
+    gsap.set(f, {
+      left: pt.x,
+      top:  pt.y,
+      x:    cx - pt.x,
+      y:    cy - pt.y,
+    });
+
     gsap.to(f, {
-      left: `${pt.x}px`,
-      top: `${pt.y}px`,
       x: 0,
       y: 0,
       opacity: rand(0.6, 1),
@@ -508,20 +556,21 @@ function launchFirework() {
   const originX = rand(window.innerWidth * 0.2, window.innerWidth * 0.8);
   const originY = rand(window.innerHeight * 0.2, window.innerHeight * 0.55);
   const colors = ['#ffd774', '#ffefb6', '#ffb95c', '#f2d48a'];
+  const particleCount = IS_MOBILE ? 16 : 32;
 
-  for (let index = 0; index < 32; index += 1) {
+  for (let index = 0; index < particleCount; index += 1) {
     const spark = document.createElement('span');
     spark.className = 'finale__spark';
     spark.style.left = `${originX}px`;
     spark.style.top = `${originY}px`;
     spark.style.background = choose(colors);
-    spark.style.boxShadow = `0 0 18px ${choose(colors)}`;
+    if (!IS_MOBILE) spark.style.boxShadow = `0 0 18px ${choose(colors)}`;
     spark.style.width = `${rand(2, 4)}px`;
     spark.style.height = spark.style.width;
     finaleSky.appendChild(spark);
 
-    const angle = (Math.PI * 2 * index) / 32;
-    const distance = rand(70, 190);
+    const angle = (Math.PI * 2 * index) / particleCount;
+    const distance = rand(IS_MOBILE ? 50 : 70, IS_MOBILE ? 130 : 190);
     gsap.to(spark, {
       x: Math.cos(angle) * distance,
       y: Math.sin(angle) * distance,
@@ -555,6 +604,10 @@ function bindHoverEffects() {
 
 function bindParallax() {
   window.addEventListener('pointermove', (event) => {
+    // На мобиле pointermove срабатывает при каждом касании —
+    // параллакс тумана и камеры не нужен, пропускаем полностью
+    if (IS_MOBILE) return;
+
     cursorX = event.clientX;
     cursorY = event.clientY;
     setRootPosition(cursorX, cursorY);
@@ -652,6 +705,40 @@ function initEvents() {
   });
 
   blowButton.addEventListener('click', setupBlowScene);
+
+  // ── Свайп для мобильных ──────────────────────────────────────────
+  // Свайп вверх или вправо работает как нажатие на активный элемент:
+  //   сцена с тортом  → открыть письмо
+  //   сцена с письмом → задуть свечу (финал)
+  if (IS_MOBILE) {
+    let swipeTouchStartX = 0;
+    let swipeTouchStartY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      swipeTouchStartX = e.changedTouches[0].clientX;
+      swipeTouchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - swipeTouchStartX;
+      const dy = e.changedTouches[0].clientY - swipeTouchStartY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      const threshold = 55; // минимальная длина свайпа в px
+
+      // Только чёткий горизонтальный или вертикальный свайп
+      const isHorizontal = absDx > absDy && absDx > threshold;
+      const isUpward     = absDy > absDx && dy < -threshold;
+
+      if (isHorizontal || isUpward) {
+        if (!STATE.opened && STATE.ready) {
+          revealLetter();
+        } else if (STATE.opened && !STATE.finale) {
+          setupBlowScene();
+        }
+      }
+    }, { passive: true });
+  }
 }
 
 function initCursor() {

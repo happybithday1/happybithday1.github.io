@@ -486,7 +486,8 @@ button {
   letter-spacing: 0.04em;
   color: #f2e6d0;
   opacity: 0;
-  transform: translateY(22px) blur(16px);
+  transform: translateY(22px);
+  filter: blur(16px);
 }
 
 .prologue__line.is-active {
@@ -1023,6 +1024,23 @@ button {
   .letter-wrap {
     top: 50%;
   }
+
+  /* GPU-хинты для плавных анимаций на планшетах и телефонах */
+  .scene__camera,
+  .cake,
+  .cake-halo,
+  .prologue,
+  .cheer,
+  .letter-wrap,
+  .finale {
+    will-change: transform, opacity;
+  }
+
+  /* Туман — убираем дорогой blur, оставляем форму */
+  .fog {
+    filter: none;
+    opacity: 0.45;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1030,48 +1048,188 @@ button {
     cursor: auto;
   }
 
+  /* Fix iOS Safari viewport height — address bar eats 100vh */
+  html, body {
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+
+  .app, .scene {
+    height: 100svh;
+    min-height: -webkit-fill-available;
+  }
+
   .cursor,
   .scroll-hint {
     display: none;
   }
 
+  /* Loading */
   .loading-screen__key {
-    min-width: 118px;
+    min-width: 110px;
   }
 
   .loading-screen__title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
   }
 
+  /* Prologue */
   .prologue {
-    top: 14px;
+    top: 12px;
+    width: min(680px, calc(100vw - 24px));
   }
 
   .prologue__line {
-    font-size: clamp(1.24rem, 6vw, 2.2rem);
+    font-size: clamp(1.05rem, 5.2vw, 1.9rem);
   }
 
+  /* Cheer */
   .cheer {
-    bottom: 68vh;
-    font-size: clamp(1.6rem, 7vw, 2.6rem);
+    bottom: 62vh;
+    font-size: clamp(1.3rem, 5.8vw, 2.1rem);
+    width: min(1400px, calc(100vw - 24px));
   }
 
+  /* Hint */
   .hint {
-    margin-bottom: 2vh;
+    margin-bottom: 1.5vh;
+    font-size: clamp(1rem, 4.2vw, 1.4rem);
+  }
+
+  /* Center stage — используем svh чтобы торт не обрезался браузерной шапкой */
+  .center-stage {
+    bottom: auto;
+    top: 50svh;
+    transform: translateX(-50%) translateY(-46%);
+    height: 42vh;
+    width: min(380px, 90vw);
+  }
+
+  /* Cake — rescale internal fixed-px elements proportionally */
+  .cake {
+    width: min(290px, 74vw);
+    height: min(195px, 50vw);
+    margin-bottom: 1.5vh;
+  }
+
+  .cake__plate {
+    height: 18px;
+  }
+
+  .cake__base {
+    bottom: 16px;
+    height: 70px;
+  }
+
+  .cake__cream {
+    bottom: 62px;
+    height: 22px;
+  }
+
+  .cake__top {
+    bottom: 74px;
+    height: 38px;
+  }
+
+  .candle {
+    bottom: 102px;
+    width: 12px;
+    height: 34px;
+  }
+
+  .candle__flame {
+    width: 14px;
+    height: 21px;
+    top: -15px;
+    /* Замедляем мерцание — на мобиле 2.8s выглядит дёргано */
+    animation-duration: 5s;
+  }
+
+  .cake-halo {
+    width: 56vw;
+    bottom: 1.5vh;
+  }
+
+  /* Road */
+  .road {
+    height: 44vh;
+  }
+
+  /* Letter */
+  .letter-wrap {
+    width: min(680px, 96vw);
+    top: 50%;
   }
 
   .letter {
-    min-height: 48vh;
-    padding: 22px 16px;
+    padding: 14px 12px;
+    min-height: auto;
+    max-height: 84svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .letter__seal {
-    width: 58px;
-    height: 58px;
+    width: 50px;
+    height: 50px;
+    right: 12px;
+    top: 12px;
   }
 
   .letter__inner {
-    padding-top: 8px;
+    padding-top: 6px;
+    padding-right: 56px;
+  }
+
+  .letter__title {
+    font-size: clamp(1.6rem, 6.5vw, 2.4rem);
+    margin-bottom: 12px;
+  }
+
+  .letter__text {
+    font-size: 1rem;
+    line-height: 1.85;
+    max-width: none;
+  }
+
+  /* Кнопка соответствует рекомендации Apple/Google — минимум 48px высоты */
+  .letter__button {
+    padding: 14px 32px;
+    min-height: 48px;
+    font-size: 1.05rem;
+    margin-top: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Finale */
+  .finale__message {
+    font-size: clamp(1.9rem, 8.5vw, 3.4rem);
+    padding: 0 16px;
+  }
+
+  /* ─── Производительность: отключаем тяжёлые фоновые анимации ─── */
+
+  /* Дрейф звёздного фона — незаметен на мобиле, но грузит GPU */
+  .sky.stars {
+    animation: none;
+  }
+
+  /* Движение тумана — fog уже без blur на мобиле, двигать нечего */
+  .fog::before,
+  .fog::after {
+    animation: none;
+  }
+
+  /* Медленное мерцание освещения — очень тонкий эффект, не нужен */
+  .lights {
+    animation: none;
+  }
+
+  /* Медленный дрейф облаков/частиц */
+  .particles::before,
+  .particles::after {
+    animation: none;
   }
 }
 
