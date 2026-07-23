@@ -710,9 +710,6 @@ button {
     linear-gradient(145deg, rgba(250, 243, 228, 0.97), rgba(235, 220, 195, 0.98)),
     linear-gradient(180deg, #faf3e4, #e0d0b0);
   color: #2c1f18;
-  max-height: 80vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   box-shadow:
     0 4px 20px rgba(217, 179, 95, 0.2),
     0 24px 70px rgba(0, 0, 0, 0.4),
@@ -1063,7 +1060,6 @@ button {
   }
 
   .letter {
-    min-height: 48vh;
     padding: 22px 16px;
   }
 
