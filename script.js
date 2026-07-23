@@ -314,8 +314,8 @@ function revealLetter() {
   const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
   // Камера плавно приближается
-  timeline.to(document.documentElement, { '--camera-scale': 1.06, duration: 1.6, ease: 'power2.inOut' }, 0);
-  timeline.to(document.documentElement, { '--camera-y': '-14px', duration: 1.6, ease: 'power2.inOut' }, 0);
+  // camera-scale при письме убран - письмо теперь fixed
+  // camera-y при письме убран
   timeline.to(camera, { filter: 'brightness(1.08) saturate(1.06)', duration: 1.4 }, 0);
 
   // Скрываем всё лишнее плавно
