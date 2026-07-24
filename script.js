@@ -448,7 +448,8 @@ function formFireflyText() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
 
-  const fontSize = Math.min(w * 0.22, 140);
+  // На мобиле шрифт меньше — текст влезает целиком и буквы не сливаются
+  const fontSize = isMobile ? Math.min(w * 0.16, 100) : Math.min(w * 0.22, 140);
   ctx.font = `bold ${fontSize}px "Cormorant Garamond", serif`;
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
@@ -457,9 +458,9 @@ function formFireflyText() {
 
   const data = ctx.getImageData(0, 0, w, h).data;
   const points = [];
-  // На мобиле — более редкая сетка, меньше точек
+  // На мобиле — мелкий шаг = плотная сетка = чёткие буквы
   const step = isMobile
-    ? Math.max(Math.floor(w / 130), 6)
+    ? Math.max(Math.floor(w / 220), 3)
     : Math.max(Math.floor(w / 280), 3);
 
   for (let y = 0; y < h; y += step) {
@@ -472,7 +473,8 @@ function formFireflyText() {
   }
 
   points.sort(() => Math.random() - 0.5);
-  const maxPoints = isMobile ? 150 : 500;
+  // На мобиле 300 точек = ~37 на букву → чёткие контуры
+  const maxPoints = isMobile ? 300 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -503,7 +505,8 @@ function formFireflyText() {
       x: 0,
       y: 0,
       opacity: rand(0.6, 1),
-      scale: rand(0.4, 0.8),
+      // На мобиле мельче — буквы выглядят резче
+      scale: isMobile ? rand(0.2, 0.45) : rand(0.4, 0.8),
       duration: rand(3.5, 6.0),
       ease: 'power3.inOut',
       onComplete: () => {
@@ -543,7 +546,7 @@ function launchFirework() {
     spark.style.height = spark.style.width;
     finaleSky.appendChild(spark);
 
-    const angle = (Math.PI * 2 * index) / 32;
+    const angle = (Math.PI * 2 * index) / particleCount;
     const distance = rand(70, 190);
     gsap.to(spark, {
       x: Math.cos(angle) * distance,
