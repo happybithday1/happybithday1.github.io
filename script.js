@@ -52,6 +52,9 @@ const STATE = {
   ready: false,
 };
 
+// Флаг мобильного устройства — определяем один раз при старте
+const isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+
 const DURATION = {
   intro: 1.4,
   settle: 1.2,
@@ -113,8 +116,13 @@ function buildAtmosphereLayer(container, className, count, factory) {
 function createAtmosphere() {
   const starsContainer = document.querySelector('.sky.stars');
 
-  // Основной звёздный слой (мерцающие точки)
-  buildAtmosphereLayer(starsContainer, 'star', 60, () => {
+  // На мобиле — меньше звёзд, без тяжёлых теней
+  const starCount      = isMobile ? 20  : 60;
+  const tinyStarCount  = isMobile ? 30  : 120;
+  const fireflyCount   = isMobile ? 8   : 35;
+
+  // Основной звёздный слой
+  buildAtmosphereLayer(starsContainer, 'star', starCount, () => {
     const star = document.createElement('span');
     const size = rand(1, 3);
     star.style.width = `${size}px`;
@@ -125,12 +133,14 @@ function createAtmosphere() {
     star.style.position = 'absolute';
     star.style.borderRadius = '50%';
     star.style.background = '#fff';
-    star.style.boxShadow = `0 0 ${rand(2,5)}px rgba(255,240,200,0.8)`;
+    if (!isMobile) {
+      star.style.boxShadow = `0 0 ${rand(2, 5)}px rgba(255,240,200,0.8)`;
+    }
     star.style.pointerEvents = 'none';
 
     gsap.to(star, {
       opacity: rand(0.5, 1),
-      duration: rand(2, 6),
+      duration: rand(isMobile ? 5 : 2, isMobile ? 12 : 6),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
@@ -139,8 +149,8 @@ function createAtmosphere() {
     return star;
   });
 
-  // Дополнительный слой мелких звёзд — плотное небо
-  buildAtmosphereLayer(starsContainer, 'star star--tiny', 120, () => {
+  // Мелкие звёзды — на мобиле статичные (без GSAP-твина)
+  buildAtmosphereLayer(starsContainer, 'star star--tiny', tinyStarCount, () => {
     const star = document.createElement('span');
     const size = rand(0.5, 1.5);
     star.style.width = `${size}px`;
@@ -153,19 +163,21 @@ function createAtmosphere() {
     star.style.background = 'rgba(255, 240, 210, 0.9)';
     star.style.pointerEvents = 'none';
 
-    gsap.to(star, {
-      opacity: rand(0.3, 0.7),
-      duration: rand(3, 8),
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      delay: rand(0, 8)
-    });
+    if (!isMobile) {
+      gsap.to(star, {
+        opacity: rand(0.3, 0.7),
+        duration: rand(3, 8),
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: rand(0, 8)
+      });
+    }
     return star;
   });
 
-  // Яркие анимированные светлячки
-  buildAtmosphereLayer(particles, 'firefly', 35, () => {
+  // Светлячки — на мобиле без mixBlendMode и boxShadow, без летящей петли
+  buildAtmosphereLayer(particles, 'firefly', fireflyCount, () => {
     const firefly = document.createElement('span');
     const size = rand(3, 8);
     firefly.style.width = `${size}px`;
@@ -174,35 +186,39 @@ function createAtmosphere() {
     firefly.style.top = `${rand(5, 95)}%`;
     firefly.style.opacity = `${rand(0.4, 0.8)}`;
     firefly.style.background = 'radial-gradient(circle, rgba(255, 240, 160, 1) 0 20%, rgba(255, 230, 120, 0.6) 45%, transparent 75%)';
-    firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
-    firefly.style.mixBlendMode = 'screen';
+    if (!isMobile) {
+      firefly.style.boxShadow = `0 0 ${rand(6, 15)}px rgba(255, 220, 80, 0.9)`;
+      firefly.style.mixBlendMode = 'screen';
+    }
     firefly.style.zIndex = '50';
 
-    // Пульсация
+    // Пульсация — на мобиле реже
     gsap.to(firefly, {
       opacity: rand(0.6, 1),
       scale: rand(1.1, 1.6),
-      duration: rand(1.5, 4),
+      duration: rand(isMobile ? 3 : 1.5, isMobile ? 7 : 4),
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
-      delay: rand(0, 3)
+      delay: rand(0, 4)
     });
 
-    // Плавный полёт
-    function fly() {
-      const xMove = rand(-window.innerWidth * 0.25, window.innerWidth * 0.25);
-      const yMove = rand(-window.innerHeight * 0.2, window.innerHeight * 0.2);
-      gsap.to(firefly, {
-        x: `+=${xMove}`,
-        y: `+=${yMove}`,
-        duration: rand(12, 25),
-        ease: 'sine.inOut',
-        onComplete: fly
-      });
+    // Полёт — только на десктопе
+    if (!isMobile) {
+      function fly() {
+        const xMove = rand(-window.innerWidth * 0.25, window.innerWidth * 0.25);
+        const yMove = rand(-window.innerHeight * 0.2, window.innerHeight * 0.2);
+        gsap.to(firefly, {
+          x: `+=${xMove}`,
+          y: `+=${yMove}`,
+          duration: rand(12, 25),
+          ease: 'sine.inOut',
+          onComplete: fly
+        });
+      }
+      setTimeout(fly, rand(0, 3000));
     }
 
-    setTimeout(fly, rand(0, 3000));
     return firefly;
   });
 
@@ -222,13 +238,15 @@ function showPrologue(lines) {
 
   const timeline = gsap.timeline();
   lineElements.forEach((line, index) => {
-    timeline.to(line, {
+    // На мобиле анимация blur пропущена — дорогая операция для GPU
+    const props = {
       opacity: 1,
       y: index === 1 ? -150 : 0,
-      filter: 'blur(0px)',
       duration: 0.9,
       ease: 'power3.out'
-    }, index === 0 ? 0 : '+=0.95');
+    };
+    if (!isMobile) props.filter = 'blur(0px)';
+    timeline.to(line, props, index === 0 ? 0 : '+=0.95');
     timeline.to(line, { opacity: 0.88, duration: 1.2 }, '+=1.0');
   });
   return timeline;
@@ -337,7 +355,7 @@ function revealLetter() {
 
   timeline.add(() => {
     createAmbientBurst(cake);
-    launchBursts(cake, 40);
+    launchBursts(cake, isMobile ? 15 : 40);
   }, 1.4);
 }
 
@@ -382,7 +400,8 @@ function setupBlowScene() {
   // Скрываем торт с тенью, чтобы экран был полностью чистым для светлячков
   textSeq.to(document.getElementById('centerStage'), { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<');
 
-  for (let index = 0; index < 120; index += 1) {
+  const bottomSparkCount = isMobile ? 40 : 120;
+  for (let index = 0; index < bottomSparkCount; index += 1) {
     const spark = document.createElement('span');
     spark.className = 'finale__spark';
     spark.style.left = `${rand(10, 90)}vw`;
@@ -406,12 +425,12 @@ function setupBlowScene() {
 
   setTimeout(() => {
     function fireworkWave() {
-      const count = Math.floor(rand(5, 10));
+      // На мобиле — меньше фейерверков, реже
+      const count = Math.floor(rand(isMobile ? 2 : 5, isMobile ? 4 : 10));
       for (let index = 0; index < count; index += 1) {
-        window.setTimeout(() => launchFirework(), index * 700);
+        window.setTimeout(() => launchFirework(), index * (isMobile ? 1100 : 700));
       }
-      // Повторяем волну каждые 3–4 секунды бесконечно
-      setTimeout(fireworkWave, rand(3000, 4500));
+      setTimeout(fireworkWave, rand(isMobile ? 5000 : 3000, isMobile ? 8000 : 4500));
     }
     fireworkWave();
   }, 900);
@@ -438,7 +457,10 @@ function formFireflyText() {
 
   const data = ctx.getImageData(0, 0, w, h).data;
   const points = [];
-  const step = Math.max(Math.floor(w / 280), 3);
+  // На мобиле — более редкая сетка, меньше точек
+  const step = isMobile
+    ? Math.max(Math.floor(w / 130), 6)
+    : Math.max(Math.floor(w / 280), 3);
 
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
@@ -450,7 +472,7 @@ function formFireflyText() {
   }
 
   points.sort(() => Math.random() - 0.5);
-  const maxPoints = 500;
+  const maxPoints = isMobile ? 150 : 500;
   if (points.length > maxPoints) points.length = maxPoints;
 
   const fireflies = Array.from(document.querySelectorAll('.firefly'));
@@ -508,8 +530,9 @@ function launchFirework() {
   const originX = rand(window.innerWidth * 0.2, window.innerWidth * 0.8);
   const originY = rand(window.innerHeight * 0.2, window.innerHeight * 0.55);
   const colors = ['#ffd774', '#ffefb6', '#ffb95c', '#f2d48a'];
+  const particleCount = isMobile ? 14 : 32;
 
-  for (let index = 0; index < 32; index += 1) {
+  for (let index = 0; index < particleCount; index += 1) {
     const spark = document.createElement('span');
     spark.className = 'finale__spark';
     spark.style.left = `${originX}px`;

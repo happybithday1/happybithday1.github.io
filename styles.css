@@ -1075,6 +1075,67 @@ button {
 
 
 
+/* ─── Мобильная оптимизация производительности ─────────────────────────── */
+@media (pointer: coarse), (max-width: 767px) {
+  /* Убираем тяжёлую сетку с mix-blend-mode */
+  body::before {
+    display: none;
+  }
+
+  /* Убираем blur с тумана — самый дорогой фильтр */
+  .fog {
+    filter: blur(4px);
+    opacity: 0.4;
+  }
+
+  /* Убираем blur с неба-свечения */
+  .sky.glow {
+    filter: none;
+  }
+
+  /* Уменьшаем blur прожекторов */
+  .stage-light {
+    filter: blur(3px);
+    opacity: 0.35;
+  }
+
+  /* Убираем blur с ореола торта */
+  .cake-halo {
+    filter: blur(6px);
+  }
+
+  /* Светлячки — gpu-слой без blend mode */
+  .firefly {
+    will-change: transform, opacity;
+    mix-blend-mode: normal;
+  }
+
+  /* Изолируем контейнер частиц */
+  .particles {
+    contain: layout style;
+  }
+
+  /* Prologue — убираем CSS blur (он анимируется через JS) */
+  .prologue__line {
+    transform: translateY(22px);
+  }
+
+  /* Убираем drop-shadow с cheer — дорого */
+  .cheer {
+    filter: none;
+  }
+
+  /* Убираем drop-shadow с подгрузки */
+  .loading-screen__key {
+    filter: none;
+  }
+
+  /* Candle flame — упрощаем тень */
+  .candle__flame {
+    box-shadow: 0 0 14px rgba(255, 209, 116, 0.7);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
