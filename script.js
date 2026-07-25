@@ -527,6 +527,53 @@ function formFireflyText() {
     gsap.killTweensOf(fireflies[i]);
     gsap.to(fireflies[i], { opacity: 0, duration: 2, onComplete: () => fireflies[i].remove() });
   }
+
+  // ── Персонажи по углам ──────────────────────────────────────────────────
+  // Появляются пока светлячки летят к своим позициям
+  const offX = isMobile ? 180 : 320;
+  const offY = isMobile ? 40  : 80;
+
+  const cornerTl = gsap.timeline({ delay: 1.6 });
+
+  // Верхний левый: «С» — вылетает из-за левого верхнего угла
+  cornerTl.fromTo('.corner-char--tl',
+    { x: -offX, y: -offY, opacity: 0, rotation: -10 },
+    { x: 0, y: 0, opacity: 1, rotation: -3, duration: 1.3, ease: 'back.out(1.4)' }
+  );
+  // Верхний правый: «19» — из правого верхнего
+  cornerTl.fromTo('.corner-char--tr',
+    { x: offX, y: -offY, opacity: 0, rotation: 10 },
+    { x: 0, y: 0, opacity: 1, rotation: 3, duration: 1.3, ease: 'back.out(1.4)' },
+    '-=1.0'
+  );
+  // Нижний левый: «-» — из левого нижнего
+  cornerTl.fromTo('.corner-char--bl',
+    { x: -offX, y: offY, opacity: 0, rotation: 10 },
+    { x: 0, y: 0, opacity: 1, rotation: 3, duration: 1.3, ease: 'back.out(1.4)' },
+    '-=1.0'
+  );
+  // Нижний правый: «летием» — из правого нижнего
+  cornerTl.fromTo('.corner-char--br',
+    { x: offX, y: offY, opacity: 0, rotation: -10 },
+    { x: 0, y: 0, opacity: 1, rotation: -3, duration: 1.3, ease: 'back.out(1.4)' },
+    '-=1.0'
+  );
+
+  // Лёгкое покачивание после выхода (как держат знак)
+  cornerTl.add(() => {
+    ['.corner-char--tl', '.corner-char--tr', '.corner-char--bl', '.corner-char--br']
+      .forEach((sel, idx) => {
+        gsap.to(sel, {
+          y: idx % 2 === 0 ? -6 : 6,
+          rotation: idx < 2 ? (idx === 0 ? -5 : 5) : (idx === 2 ? 5 : -5),
+          duration: 2.2 + idx * 0.3,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: idx * 0.4
+        });
+      });
+  });
 }
 
 function launchFirework() {

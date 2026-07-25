@@ -1075,8 +1075,57 @@ button {
 
 
 
+/* ─── Персонажи по углам ────────────────────────────────────────────────── */
+.corner-chars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 300;
+}
+
+.corner-char {
+  position: absolute;
+  width: min(190px, 24vw);
+  height: auto;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Верхний левый — знак «С», ноги уходят вниз */
+.corner-char--tl {
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+/* Верхний правый — знак «19» */
+.corner-char--tr {
+  top: 0;
+  right: 0;
+  transform-origin: top right;
+}
+
+/* Нижний левый — знак «-» */
+.corner-char--bl {
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom left;
+}
+
+/* Нижний правый — знак «летием» */
+.corner-char--br {
+  bottom: 0;
+  right: 0;
+  transform-origin: bottom right;
+}
+
 /* ─── Мобильная оптимизация производительности ─────────────────────────── */
 @media (pointer: coarse), (max-width: 767px) {
+  /* Персонажи по углам — меньше на мобиле */
+  .corner-char {
+    width: min(100px, 26vw);
+  }
+
   /* Убираем тяжёлую сетку с mix-blend-mode */
   body::before {
     display: none;
