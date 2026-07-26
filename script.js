@@ -529,52 +529,47 @@ function formFireflyText() {
   }
 
   // ── Персонажи по углам ──────────────────────────────────────────────────
-  // Выезжают по диагонали из своего угла
-  const wrapW = isMobile ? 110 : 185;
-  const wrapH = isMobile ? 145 : 240;
+  // Выезжают строго из своего угла (диагональный вылет)
+  const wrapW = isMobile ? 200 : 370;
+  const wrapH = isMobile ? 270 : 500;
 
   const cornerTl = gsap.timeline({ delay: 1.6 });
 
-  // Верхний левый: из угла вниз-вправо (вниз головой)
+  // Верхний левый: из верхнего левого угла — диагонально вниз-вправо
   cornerTl.fromTo('#cwTl',
-    { x: -wrapW, y: -wrapH, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' }
+    { x: -wrapW * 0.7, y: -wrapH * 0.7, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' }
   );
-  // Верхний правый: из угла вниз-влево (вниз головой)
+  // Верхний правый: из верхнего правого угла
   cornerTl.fromTo('#cwTr',
-    { x: wrapW, y: -wrapH, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
-    '-=1.1'
+    { x: wrapW * 0.7, y: -wrapH * 0.7, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' },
+    '-=1.2'
   );
-  // Нижний левый: из угла вверх-вправо
+  // Нижний левый: из нижнего левого угла
   cornerTl.fromTo('#cwBl',
-    { x: -wrapW, y: wrapH, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
-    '-=1.1'
+    { x: -wrapW * 0.7, y: wrapH * 0.7, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' },
+    '-=1.2'
   );
-  // Нижний правый: из угла вверх-влево
+  // Нижний правый: из нижнего правого угла
   cornerTl.fromTo('#cwBr',
-    { x: wrapW, y: wrapH, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
-    '-=1.1'
+    { x: wrapW * 0.7, y: wrapH * 0.7, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' },
+    '-=1.2'
   );
 
-  // Плавное покачивание после выхода
+  // Плавное покачивание после выхода (отдельное по X и Y для живости)
   cornerTl.add(() => {
-    [
-      { sel: '#cwTl', dy: 8 },
-      { sel: '#cwTr', dy: 8 },
-      { sel: '#cwBl', dy: -8 },
-      { sel: '#cwBr', dy: -8 },
-    ].forEach(({ sel, dy }, idx) => {
-      gsap.to(sel, {
-        y: dy,
-        duration: 2.4 + idx * 0.25,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: idx * 0.35,
-      });
+    const pairs = [
+      { sel: '#cwTl', dx:  6, dy:  8 },
+      { sel: '#cwTr', dx: -6, dy:  8 },
+      { sel: '#cwBl', dx:  6, dy: -8 },
+      { sel: '#cwBr', dx: -6, dy: -8 },
+    ];
+    pairs.forEach(({ sel, dx, dy }, idx) => {
+      gsap.to(sel, { x: dx, duration: 2.2 + idx * 0.2, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: idx * 0.3 });
+      gsap.to(sel, { y: dy, duration: 2.6 + idx * 0.25, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: idx * 0.45 });
     });
   });
 }

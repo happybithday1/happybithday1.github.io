@@ -1088,8 +1088,8 @@ button {
 .cw {
   position: absolute;
   overflow: hidden;
-  width: min(185px, 23vw);
-  height: min(250px, 31vw);
+  width: min(370px, 38vw);
+  height: min(500px, 51vw);
   will-change: transform, opacity;
   opacity: 0;
 }
@@ -1113,12 +1113,11 @@ button {
   top: 0;
 }
 
-/* Верхние углы: вниз головой — полный поворот на 180°,
-   ноги скрыты за верхним краем, текст на знаке читается корректно */
+/* Верхние углы: только вертикальный переворот (scaleY) — БЕЗ горизонтального зеркала */
 .cw--tl .corner-char,
 .cw--tr .corner-char {
   bottom: 0;
-  transform: rotate(180deg);
+  transform: scaleY(-1);
   transform-origin: center;
 }
 
@@ -1126,8 +1125,8 @@ button {
 @media (pointer: coarse), (max-width: 767px) {
   /* Персонажи по углам — меньше на мобиле */
   .cw {
-    width: min(110px, 27vw);
-    height: min(148px, 36vw);
+    width: min(200px, 48vw);
+    height: min(270px, 65vw);
   }
 
   /* Убираем тяжёлую сетку с mix-blend-mode */
