@@ -529,32 +529,33 @@ function formFireflyText() {
   }
 
   // ── Персонажи по углам ──────────────────────────────────────────────────
-  // Верхние углы — вниз головой (выезжают сверху), нижние — нормально (снизу)
+  // Выезжают по диагонали из своего угла
+  const wrapW = isMobile ? 110 : 185;
   const wrapH = isMobile ? 145 : 240;
 
   const cornerTl = gsap.timeline({ delay: 1.6 });
 
-  // Верхний левый: «С» — выезжает сверху (вниз головой)
+  // Верхний левый: из угла вниз-вправо (вниз головой)
   cornerTl.fromTo('#cwTl',
-    { y: -wrapH, opacity: 0 },
-    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' }
+    { x: -wrapW, y: -wrapH, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' }
   );
-  // Верхний правый: «19» — выезжает сверху (вниз головой)
+  // Верхний правый: из угла вниз-влево (вниз головой)
   cornerTl.fromTo('#cwTr',
-    { y: -wrapH, opacity: 0 },
-    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
+    { x: wrapW, y: -wrapH, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
     '-=1.1'
   );
-  // Нижний левый: «-» — выезжает снизу вверх
+  // Нижний левый: из угла вверх-вправо
   cornerTl.fromTo('#cwBl',
-    { y: wrapH, opacity: 0 },
-    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
+    { x: -wrapW, y: wrapH, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
     '-=1.1'
   );
-  // Нижний правый: «летием» — выезжает снизу вверх
+  // Нижний правый: из угла вверх-влево
   cornerTl.fromTo('#cwBr',
-    { y: wrapH, opacity: 0 },
-    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
+    { x: wrapW, y: wrapH, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
     '-=1.1'
   );
 
