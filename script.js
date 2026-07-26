@@ -529,50 +529,52 @@ function formFireflyText() {
   }
 
   // ── Персонажи по углам ──────────────────────────────────────────────────
-  // Появляются пока светлячки летят к своим позициям
-  const offX = isMobile ? 180 : 320;
-  const offY = isMobile ? 40  : 80;
+  // Верхние углы — вниз головой (выезжают сверху), нижние — нормально (снизу)
+  const wrapH = isMobile ? 145 : 240;
 
   const cornerTl = gsap.timeline({ delay: 1.6 });
 
-  // Верхний левый: «С» — вылетает из-за левого верхнего угла
-  cornerTl.fromTo('.corner-char--tl',
-    { x: -offX, y: -offY, opacity: 0, rotation: -10 },
-    { x: 0, y: 0, opacity: 1, rotation: -3, duration: 1.3, ease: 'back.out(1.4)' }
+  // Верхний левый: «С» — выезжает сверху (вниз головой)
+  cornerTl.fromTo('#cwTl',
+    { y: -wrapH, opacity: 0 },
+    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' }
   );
-  // Верхний правый: «19» — из правого верхнего
-  cornerTl.fromTo('.corner-char--tr',
-    { x: offX, y: -offY, opacity: 0, rotation: 10 },
-    { x: 0, y: 0, opacity: 1, rotation: 3, duration: 1.3, ease: 'back.out(1.4)' },
-    '-=1.0'
+  // Верхний правый: «19» — выезжает сверху (вниз головой)
+  cornerTl.fromTo('#cwTr',
+    { y: -wrapH, opacity: 0 },
+    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
+    '-=1.1'
   );
-  // Нижний левый: «-» — из левого нижнего
-  cornerTl.fromTo('.corner-char--bl',
-    { x: -offX, y: offY, opacity: 0, rotation: 10 },
-    { x: 0, y: 0, opacity: 1, rotation: 3, duration: 1.3, ease: 'back.out(1.4)' },
-    '-=1.0'
+  // Нижний левый: «-» — выезжает снизу вверх
+  cornerTl.fromTo('#cwBl',
+    { y: wrapH, opacity: 0 },
+    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
+    '-=1.1'
   );
-  // Нижний правый: «летием» — из правого нижнего
-  cornerTl.fromTo('.corner-char--br',
-    { x: offX, y: offY, opacity: 0, rotation: -10 },
-    { x: 0, y: 0, opacity: 1, rotation: -3, duration: 1.3, ease: 'back.out(1.4)' },
-    '-=1.0'
+  // Нижний правый: «летием» — выезжает снизу вверх
+  cornerTl.fromTo('#cwBr',
+    { y: wrapH, opacity: 0 },
+    { y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.3)' },
+    '-=1.1'
   );
 
-  // Лёгкое покачивание после выхода (как держат знак)
+  // Плавное покачивание после выхода
   cornerTl.add(() => {
-    ['.corner-char--tl', '.corner-char--tr', '.corner-char--bl', '.corner-char--br']
-      .forEach((sel, idx) => {
-        gsap.to(sel, {
-          y: idx % 2 === 0 ? -6 : 6,
-          rotation: idx < 2 ? (idx === 0 ? -5 : 5) : (idx === 2 ? 5 : -5),
-          duration: 2.2 + idx * 0.3,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: idx * 0.4
-        });
+    [
+      { sel: '#cwTl', dy: 8 },
+      { sel: '#cwTr', dy: 8 },
+      { sel: '#cwBl', dy: -8 },
+      { sel: '#cwBr', dy: -8 },
+    ].forEach(({ sel, dy }, idx) => {
+      gsap.to(sel, {
+        y: dy,
+        duration: 2.4 + idx * 0.25,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: idx * 0.35,
       });
+    });
   });
 }
 

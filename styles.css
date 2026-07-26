@@ -1083,47 +1083,51 @@ button {
   z-index: 300;
 }
 
+/* ─── Обёртки угловых персонажей ───────────────────────────────────── */
+/* overflow:hidden обрезает ноги; все одного размера */
+.cw {
+  position: absolute;
+  overflow: hidden;
+  width: min(185px, 23vw);
+  height: min(250px, 31vw);
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.cw--tl { top: 0; left: 0; }
+.cw--tr { top: 0; right: 0; }
+.cw--bl { bottom: 0; left: 0; }
+.cw--br { bottom: 0; right: 0; }
+
+/* Общий стиль изображения внутри обёртки */
 .corner-char {
   position: absolute;
-  width: min(190px, 24vw);
+  width: 100%;
   height: auto;
-  opacity: 0;
-  will-change: transform, opacity;
+  display: block;
 }
 
-/* Верхний левый — знак «С», ноги уходят вниз */
-.corner-char--tl {
+/* Нижние углы: нормальное положение, знак вверху, ноги уходят вниз */
+.cw--bl .corner-char,
+.cw--br .corner-char {
   top: 0;
-  left: 0;
-  transform-origin: top left;
 }
 
-/* Верхний правый — знак «19» */
-.corner-char--tr {
-  top: 0;
-  right: 0;
-  transform-origin: top right;
-}
-
-/* Нижний левый — знак «-» */
-.corner-char--bl {
+/* Верхние углы: вниз головой — изображение перевёрнуто,
+   знак оказывается снизу (торчит в экран), ноги скрыты за верхним краем */
+.cw--tl .corner-char,
+.cw--tr .corner-char {
   bottom: 0;
-  left: 0;
-  transform-origin: bottom left;
-}
-
-/* Нижний правый — знак «летием» */
-.corner-char--br {
-  bottom: 0;
-  right: 0;
-  transform-origin: bottom right;
+  transform: scale(1, -1);
+  transform-origin: center;
 }
 
 /* ─── Мобильная оптимизация производительности ─────────────────────────── */
 @media (pointer: coarse), (max-width: 767px) {
   /* Персонажи по углам — меньше на мобиле */
-  .corner-char {
-    width: min(100px, 26vw);
+  .cw {
+    width: min(110px, 27vw);
+    height: min(148px, 36vw);
   }
 
   /* Убираем тяжёлую сетку с mix-blend-mode */
