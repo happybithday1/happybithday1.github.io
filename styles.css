@@ -1108,17 +1108,11 @@ button {
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: top center;
+  object-position: bottom center;
 }
 
-/* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз.
-   object-position: top center показывает голову/знак, flip опускает их к экрану */
-/* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз */
-.cw--tl .corner-char,
-.cw--tr .corner-char {
-  transform: scaleY(-1);
-  transform-origin: center;
-}
+/* Верхние углы: изображения хранятся перевёрнутыми — object-position: bottom center
+   показывает нижнюю часть исходника (знак + голова) у верхнего края экрана */
 
 /* ─── Мобильная оптимизация производительности ─────────────────────────── */
 @media (pointer: coarse), (max-width: 767px) {
