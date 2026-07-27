@@ -1100,23 +1100,22 @@ button {
 .cw--br { bottom: 0; right: 0; }
 
 /* Общий стиль изображения внутри обёртки */
+/* object-fit гарантирует правильное заполнение на любом устройстве */
 .corner-char {
   position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+  object-fit: cover;
+  object-position: top center;
 }
 
-/* Нижние углы: нормальное положение, знак вверху, ноги уходят вниз */
-.cw--bl .corner-char,
-.cw--br .corner-char {
-  top: 0;
-}
-
-/* Верхние углы: только вертикальный переворот (scaleY) — БЕЗ горизонтального зеркала */
+/* Верхние углы: scaleY(-1) переворачивает вертикально — голова вниз, табличка у экрана
+   object-position: top — в источнике берётся верхняя часть (знак + голова),
+   scaleY(-1) переворачивает её вниз → знак оказывается у края экрана, текст читается */
 .cw--tl .corner-char,
 .cw--tr .corner-char {
-  bottom: 0;
   transform: scaleY(-1);
   transform-origin: center;
 }

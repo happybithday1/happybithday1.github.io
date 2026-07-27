@@ -529,37 +529,50 @@ function formFireflyText() {
   }
 
   // ── Персонажи по углам ──────────────────────────────────────────────────
-  // Выезжают строго из своего угла (диагональный вылет)
+  // Гарантированно запускаем только один раз
+  if (window._cornersReady) return;
+  window._cornersReady = true;
+
   const wrapW = isMobile ? 200 : 370;
   const wrapH = isMobile ? 270 : 500;
 
+  // Сбрасываем видимость и убиваем старые твины на случай повторного вызова
+  ['#cwTl', '#cwTr', '#cwBl', '#cwBr'].forEach(sel => {
+    gsap.killTweensOf(sel);
+    gsap.set(sel, { x: 0, y: 0, opacity: 0 });
+  });
+
   const cornerTl = gsap.timeline({ delay: 1.6 });
 
-  // Верхний левый: из верхнего левого угла — диагонально вниз-вправо
+  // Смещение: полный размер обёртки + 20px — персонаж ПОЛНОСТЬЮ за экраном
+  const offX = wrapW + 20;
+  const offY = wrapH + 20;
+
+  // Верхний левый: из верхнего левого угла диагонально
   cornerTl.fromTo('#cwTl',
-    { x: -wrapW * 0.7, y: -wrapH * 0.7, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' }
+    { x: -offX, y: -offY, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.1)' }
   );
-  // Верхний правый: из верхнего правого угла
+  // Верхний правый
   cornerTl.fromTo('#cwTr',
-    { x: wrapW * 0.7, y: -wrapH * 0.7, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' },
-    '-=1.2'
+    { x: offX, y: -offY, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.1)' },
+    '-=1.1'
   );
-  // Нижний левый: из нижнего левого угла
+  // Нижний левый
   cornerTl.fromTo('#cwBl',
-    { x: -wrapW * 0.7, y: wrapH * 0.7, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' },
-    '-=1.2'
+    { x: -offX, y: offY, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.1)' },
+    '-=1.1'
   );
-  // Нижний правый: из нижнего правого угла
+  // Нижний правый
   cornerTl.fromTo('#cwBr',
-    { x: wrapW * 0.7, y: wrapH * 0.7, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: 1.5, ease: 'back.out(1.2)' },
-    '-=1.2'
+    { x: offX, y: offY, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: 1.4, ease: 'back.out(1.1)' },
+    '-=1.1'
   );
 
-  // Плавное покачивание после выхода (отдельное по X и Y для живости)
+  // Плавное покачивание после выхода
   cornerTl.add(() => {
     const pairs = [
       { sel: '#cwTl', dx:  6, dy:  8 },
