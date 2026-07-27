@@ -980,6 +980,7 @@ button {
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  opacity: 0;
 }
 
 /* Размеры на мобиле */
@@ -1024,15 +1025,9 @@ button {
   display: block;
 }
 
-/* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз */
-.cw--tl .corner-char {
-  transform: scaleY(-1);
-  transform-origin: center;
-}
-
-/* Правый верхний: вертикальный + горизонтальный флип для корректного отображения */
+/* Правый верхний: горизонтальный флип для зеркального отображения */
 .cw--tr .corner-char {
-  transform: scaleX(-1) scaleY(-1);
+  transform: scaleX(-1);
   transform-origin: center;
 }
 
