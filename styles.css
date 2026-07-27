@@ -966,6 +966,64 @@ button {
   opacity: 0;
 }
 
+/* Персонажи по углам */
+.corner-chars {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.cw {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Размеры на мобиле */
+.cw {
+  width: 200px;
+  height: 270px;
+}
+
+/* Размеры на десктопе */
+@media (min-width: 768px) {
+  .cw {
+    width: 370px;
+    height: 500px;
+  }
+}
+
+.cw--tl {
+  top: 0;
+  left: 0;
+}
+
+.cw--tr {
+  top: 0;
+  right: 0;
+}
+
+.cw--bl {
+  bottom: 0;
+  left: 0;
+}
+
+.cw--br {
+  bottom: 0;
+  right: 0;
+}
+
+.corner-char {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
 /* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз */
 .cw--tl .corner-char {
   transform: scaleY(-1);
