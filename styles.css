@@ -1111,14 +1111,7 @@ button {
   object-position: top center;
 }
 
-/* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз.
-   object-position: top center показывает голову/знак, flip опускает их к экрану */
-/* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз */
-.cw--tl .corner-char,
-.cw--tr .corner-char {
-  transform: scaleY(-1);
-  transform-origin: center;
-}
+/* Верхние углы: без переворота — текст на табличках читается прямо */
 
 /* ─── Мобильная оптимизация производительности ─────────────────────────── */
 @media (pointer: coarse), (max-width: 767px) {
