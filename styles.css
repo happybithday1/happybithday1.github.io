@@ -1113,9 +1113,14 @@ button {
 
 /* Верхние углы: scaleY(-1) переворачивает персонажа головой вниз.
    object-position: top center показывает голову/знак, flip опускает их к экрану */
-.cw--tl .corner-char,
-.cw--tr .corner-char {
+/* Левый верхний: только вертикальный флип */
+.cw--tl .corner-char {
   transform: scaleY(-1);
+  transform-origin: center;
+}
+/* Правый верхний: вертикальный + горизонтальный флип, чтобы «19» не зеркалилась */
+.cw--tr .corner-char {
+  transform: scaleX(-1) scaleY(-1);
   transform-origin: center;
 }
 
