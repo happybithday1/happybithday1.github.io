@@ -425,12 +425,12 @@ function setupBlowScene() {
 
   setTimeout(() => {
     function fireworkWave() {
-      // На мобиле — меньше фейерверков, реже
-      const count = Math.floor(rand(isMobile ? 2 : 5, isMobile ? 4 : 10));
+      // На мобиле — больше фейерверков, чаще
+      const count = Math.floor(rand(isMobile ? 5 : 5, isMobile ? 9 : 10));
       for (let index = 0; index < count; index += 1) {
-        window.setTimeout(() => launchFirework(), index * (isMobile ? 1100 : 700));
+        window.setTimeout(() => launchFirework(), index * (isMobile ? 550 : 700));
       }
-      setTimeout(fireworkWave, rand(isMobile ? 5000 : 3000, isMobile ? 8000 : 4500));
+      setTimeout(fireworkWave, rand(isMobile ? 2000 : 3000, isMobile ? 3500 : 4500));
     }
     fireworkWave();
   }, 900);
@@ -591,7 +591,7 @@ function launchFirework() {
   const originX = rand(window.innerWidth * 0.2, window.innerWidth * 0.8);
   const originY = rand(window.innerHeight * 0.2, window.innerHeight * 0.55);
   const colors = ['#ffd774', '#ffefb6', '#ffb95c', '#f2d48a'];
-  const particleCount = isMobile ? 14 : 32;
+  const particleCount = isMobile ? 26 : 32;
 
   for (let index = 0; index < particleCount; index += 1) {
     const spark = document.createElement('span');

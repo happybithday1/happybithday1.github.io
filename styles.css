@@ -1108,17 +1108,11 @@ button {
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: top center;
+  object-position: bottom center;
 }
 
-/* Верхние углы: scaleY(-1) переворачивает вертикально — голова вниз, табличка у экрана
-   object-position: top — в источнике берётся верхняя часть (знак + голова),
-   scaleY(-1) переворачивает её вниз → знак оказывается у края экрана, текст читается */
-.cw--tl .corner-char,
-.cw--tr .corner-char {
-  transform: scaleY(-1);
-  transform-origin: center;
-}
+/* Верхние углы: изображения хранятся перевёрнутыми — object-position: bottom center
+   показывает нижнюю часть исходника (знак + голова) у верхнего края экрана */
 
 /* ─── Мобильная оптимизация производительности ─────────────────────────── */
 @media (pointer: coarse), (max-width: 767px) {
